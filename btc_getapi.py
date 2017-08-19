@@ -2,9 +2,8 @@
 # btctrade
 
 
-import os, json, thread, mimetypes, smtplib, random, time, redis, traceback, re, urllib,requests
+import os, json, thread, mimetypes, smtplib, random, time, traceback, re, urllib,requests
 from libs import mHTTP, mBusiLog, mUtil, mEnv, mDBA2
-from bs4 import BeautifulSoup
 from threading import Timer
 
 
