@@ -44,7 +44,7 @@ env_dbinfo={
         'db_conn_num': 3
     },
     'work':{
-        'db_host': '127.0.0.1',
+        'db_host': '115.238.54.181',
         'db_user': 'stock',
         'db_passwd': '123',
         'db_name': 'stock',
