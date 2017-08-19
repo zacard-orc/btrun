@@ -60,7 +60,7 @@ class A_SDB:
                     '' + str(o['vol']) + '' \
                      ')'
         logging.debug('插入btc k5行情')
-        self.DMLSql()
+        self.DMLSql(logflag=False)
 
     def sBtcDealHis(self,o):
         self.sql = 'replace into btc_market_dealhis(utc,price,amount,tid,dltype,updateAt) values (' \

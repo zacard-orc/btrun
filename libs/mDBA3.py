@@ -13,7 +13,7 @@ import mEnv
 from mUtil import  u8
 
 
-runEv=os.getenv('PYVV')
+runEv='ana'
 db_host=mEnv.env_dbinfo[runEv]['db_host']
 db_user=mEnv.env_dbinfo[runEv]['db_user']
 db_passwd=mEnv.env_dbinfo[runEv]['db_passwd']
@@ -36,77 +36,14 @@ class A_SDB:
     def __init__(self):
         self.sql=''
 
-    def slogin_queryByAcct(self,o):
-        self.sql='select * from rpmall_userinfo where ' \
+    def sbtc_loadk5(self,o):
+        self.sql='select * from btc_market_k5 where ' \
                  'acct=\'' + o +'\''
         logging.debug('根据acct查询账户记录')
         return self.OpsSql()
 
 
 
-    #文章基础库
-    def sD_mpMain_Insert(self,o):
-        self.sql='replace into dpp_mp_main values(' \
-                 '\'' + o['mp_biz'] +'\',' \
-                 '\'' + o['mp_mid'] +'\',' \
-                 '\'' + o['mp_sn'] +'\',' \
-                 '\'' + o['mp_idx'] +'\',' \
-                 '\'' + MySQLdb.escape_string(o['art_title']) + '\',' \
-                 '\'' + MySQLdb.escape_string(o['art_mp_name']) + '\',' \
-                 '\'' + o['art_pubdate'] + '\',' \
-                 '\'' + MySQLdb.escape_string(o['art_author_name']) + '\',' \
-                 '\'' + o['art_type'] + '\',' \
-                 '\'' + o['art_origin_url'] + '\',' \
-                  '\'' + o['art_new_url'] + '\',' \
-                  'now())'
-        self.DMLSql(logflag=True)
-
-    def sD_mpMainQrcode_Query(self,o):
-        self.sql='select qrcode_path from dpp_mp_qrcode where  ' \
-                 'mp_biz=\'' + o['mp_biz'] +'\' '
-        return self.OpsSql(logflag=True)
-
-    def sD_mpMainQrcode_Replace(self, o):
-        self.sql = 'replace into dpp_mp_qrcode values (  ' \
-                   '\'' + o['mp_biz'] + '\', ' \
-                   '\'' + o['qrcode_path'] + '\', now())'
-        self.DMLSql(logflag=True)
-
-    def sD_mpSucai_Clear(self,o):
-        self.sql='delete from dpp_mp_artsucai where mp_mid=\'' + o['mp_mid'] + '\';'
-        self.DMLSql(logflag=True)
-
-    def sD_mpSucai_Insert(self,o):
-        self.sql='insert into dpp_mp_artsucai values(' \
-                 '\'' + o['mp_mid'] +'\',' \
-                 '\'' + o['sc_url'] +'\',' \
-                 '\'' + o['sc_type'] +'\',' \
-                 '\'' + o['sc_size'] + '\',' \
-                 'now()' \
-                 ')'
-        self.DMLSql(logflag=True)
-
-    def sD_mpHtml_Insert(self,o):
-        self.sql = 'replace into dpp_mp_arthtml values(' \
-                   '\'' + o['mp_mid'] + '\',' \
-                    '\'' + MySQLdb.escape_string(o['art_html']) + '\',' \
-                   'now()' \
-                   ')'
-        self.DMLSql(logflag=False)
-
-    def sD_mpPv_IfExist(self,o):
-        self.sql = 'select count(*) as cc from dpp_mp_artpv where mp_mid=' \
-               '\'' + o['mp_mid'] + '\' '
-        return self.OpsSql(logflag=False)
-
-    def sD_mpPv_insert(self,o):
-        self.sql = 'replace into dpp_mp_artpv values(' \
-                   '\'' + o['mp_mid'] + '\',' \
-                   '' + str(o['num_pv']) + ',' \
-                   '' + str(o['num_like']) + ',' \
-                   'now()' \
-                   ')'
-        self.DMLSql(logflag=False)
 
 
     def DMLSql(self,logflag=True):

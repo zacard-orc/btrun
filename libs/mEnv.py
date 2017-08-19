@@ -52,6 +52,16 @@ env_dbinfo={
         'db_charset': 'utf8',
         'db_conn_num': 3
     },
+    'ana':{
+            'db_host': '115.238.54.181',
+            'db_user': 'stock',
+            'db_passwd': '123',
+            'db_name': 'stock',
+            'db_port': 3306,
+            'db_charset': 'utf8',
+            'db_conn_num': 3
+    }
+
 }
 
 env_path={
