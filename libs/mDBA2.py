@@ -60,7 +60,7 @@ class A_SDB:
                     '\'' + o['updateAt'] + '\'' \
                     ')'
         logging.debug('插入btc历史交易')
-        self.DMLSql()
+        self.DMLSql(logflag=False)
 
 
     def DMLSql(self,logflag=True):
