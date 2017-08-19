@@ -38,111 +38,29 @@ class A_SDB:
         self.sql=''
 
 
-    def sAdStatsGetPubId(self, o):
-        add_sql=''
-        if o['acct'] == 'tu':
-            add_sql=''
-        else:
-            add_sql='and acct=\'' + o['pub_acct'] +'\''
-        self.sql = 'select acct,pub_name,pub_id from dpp_ad_task where is_block=0 '+add_sql
-        logging.debug('查询ACCT下的PUB-ID任务数量')
-        return self.OpsSql()
 
-    def sAdClearByPubId(self,o):
-        self.sql = 'delete from dpp_ad_main where pub_id=\'' + o['pub_id'] +'\''
-        logging.debug('清空原先的任务')
-        self.DMLSql()
-
-    def sAdQueryByAcctAndPubId(self, o):
-        self.sql = 'select * from dpp_ad_main where pub_id=\''+o['pub_id']+'\' and adp_acct=\''+o['acct']+'\''
-        logging.debug('读取该PUB-ID下的广告配置')
-        return self.OpsSql()
-
-    def sAdInsertNewAdConfig(self,o):
-        self.sql = 'insert into dpp_ad_main(adp_acct,pub_id,pub_sucai,pub_link,pub_obj,pub_sucai_type) values (' \
-                   '\'' + o['acct'] +'\',' \
-                    '\'' + o['pub_id'] + '\',' \
-                    '\'' + o['pub_sucai'] + '\',' \
-                    '\'' + o['pub_link'] + '\',' \
-                    '\'' + o['pub_obj'] + '\',' \
-                    '\'' + o['pub_sucai_type'] + '\'' \
+    def sBtcMarkInsert(self,o):
+        self.sql = 'insert into btc_market_live(utc,last,vol,vol_delta,updateAt) values (' \
+                   '' + str(o['time']) +',' \
+                    '' + str(o['last']) + ',' \
+                    '' + str(o['vol']) + ',' \
+                    '' + str(o['vol_delta']) + ',' \
+                    '\'' + o['updateAt'] + '\'' \
                     ')'
-        logging.debug('插入新的广告投放具体配置ByPubId')
+        logging.debug('插入btc行情')
         self.DMLSql()
 
-
-    def slogin_queryByAcct(self,o):
-        self.sql='select * from dpp_ad_adpinfo where ' \
-                 'adp_acct=\'' + o +'\''
-        logging.debug('根据acct查询账户记录')
-        return self.OpsSql()
-
-    def sLoadArtTypeList(self):
-        self.sql = 'select * from dpp_mp_arttype'
-        logging.debug('读取分类枚举值')
-        return self.OpsSql()
-
-    def sLoadAdTask(self,o):
-        #
-        add_sql1=''
-        add_sql2 = ' (acct like \'%' + o['setext'] + '%\' ' \
-                        ' or pub_name like \'%' + o['setext'] + '%\' ' \
-                        ' or pub_id like \'%' + o[
-                        'setext'] + '%\') '
-        if o['acct']=='tu':
-            add_sql1 = ' where '+add_sql2
-        else:
-            add_sql1 = ' where acct=\'' + o['acct'] + '\' and '+add_sql2
-
-        self.sql = 'select acct,pub_name,pub_id,is_block,' \
-                   'date_format(createdAt,\'%m-%d %H:%i\') as createdAt' \
-                   ' from dpp_ad_task  '+add_sql1+' order by pub_id desc '
-        logging.debug('读取acct下的广告任务')
-        return self.OpsSql()
-
-    def sNewAdTask(self,o):
-        self.sql = 'insert into dpp_ad_task(acct,pub_name,pub_id,createdAt) values (' \
-                   '\'' + o['acct'] +'\',' \
-                    '\'' + o['pub_name'] + '\',' \
-                    '\'' + o['pub_id'] + '\',' \
-                   'now()' \
-                    ' )'
-        logging.debug('新建广告任务')
+    def sBtcDealHis(self,o):
+        self.sql = 'replace into btc_market_dealhis(utc,price,amount,tid,dltype,updateAt) values (' \
+                   '' + str(o['date']) +',' \
+                    '' + str(o['price']) + ',' \
+                    '' + str(o['amount']) + ',' \
+                    '\'' + o['tid'] + '\',' \
+                    '\'' + o['type'] + '\',' \
+                    '\'' + o['updateAt'] + '\'' \
+                    ')'
+        logging.debug('插入btc历史交易')
         self.DMLSql()
-
-
-    def sLoadMpInfoBySearch(self,o):
-        add_sql=''
-        if len(o['setext'])>0:
-            add_sql=' and (a.art_mp_name like \'%'+o['setext']+'%\' ' \
-                   ' or a.art_title like \'%'+o['setext']+'%\' ' \
-                   ' or a.art_type like  \'%'+o['setext']+'%\' ' \
-                    'or a.mp_mid like    \'%'+o['setext']+'%\') '
-
-        self.sql = 'select a.mp_mid,a.art_title,a.art_mp_name,a.art_type,a.art_new_url,' \
-                   'date_format(a.updateAt,\'%m-%d %H:%i\') as updateAt, ' \
-                   ' b.num_pv,b.num_like '\
-                   ' from dpp_mp_main a, '\
-                   ' dpp_mp_artpv b where a.mp_mid=b.mp_mid  ' \
-                   ''+add_sql+' ' \
-                   ' order by a.mp_mid  desc limit '+str(o['page'])+',10'
-        logging.debug('搜索文章')
-        return self.OpsSql()
-
-    def sLoadMpInfoBySearchCount(self,o):
-        add_sql=''
-        if len(o['setext'])>0:
-            add_sql=' and (a.art_mp_name like \'%'+o['setext']+'%\' ' \
-                   ' or a.art_title like \'%'+o['setext']+'%\' ' \
-                   ' or a.art_type like  \'%'+o['setext']+'%\' ' \
-                    'or a.mp_mid like    \'%'+o['setext']+'%\') '
-
-        self.sql = 'select count(*) as cc '\
-                   ' from dpp_mp_main a, '\
-                   ' dpp_mp_artpv b where a.mp_mid=b.mp_mid  ' \
-                   ''+add_sql+' '
-        logging.debug('搜索文章获取总数')
-        return self.OpsSql()
 
 
     def DMLSql(self,logflag=True):

@@ -39,3 +39,9 @@ def random_num():
 
 def u8(o):
     return o.encode('utf-8')
+
+def UTCtoSTDStamp(a):
+    dtstr = '1970-01-01 00:00:00'
+    utcstartstamp=datetime.datetime.strptime(dtstr, "%Y-%m-%d %H:%M:%S")
+    comafterstamp=utcstartstamp+datetime.timedelta(seconds=int(a),hours=8)
+    return comafterstamp.strftime("%Y-%m-%d %H:%M:%S")
