@@ -47,16 +47,28 @@ class A_SDB:
                     '' + str(o['vol_delta']) + ',' \
                     '\'' + o['updateAt'] + '\'' \
                     ')'
-        logging.debug('插入btc行情')
+        logging.debug('插入btc实时行情')
+        self.DMLSql()
+
+    def sBtcMarkK5(self,o):
+        self.sql = 'replace into btc_market_k5(ddtime,open,high,low,close,vol) values (' \
+                   '\'' + o['ddtime'] +'\',' \
+                    '' + str(o['open']) + ',' \
+                    '' + str(o['high']) + ',' \
+                    '' + str(o['low']) + ',' \
+                    '' + str(o['close']) + ',' \
+                    '' + str(o['vol']) + '' \
+                     ')'
+        logging.debug('插入btc k5行情')
         self.DMLSql()
 
     def sBtcDealHis(self,o):
         self.sql = 'replace into btc_market_dealhis(utc,price,amount,tid,dltype,updateAt) values (' \
-                   '' + str(o['date']) +',' \
+                   '\'' + o['utc'] +'\',' \
                     '' + str(o['price']) + ',' \
                     '' + str(o['amount']) + ',' \
                     '\'' + o['tid'] + '\',' \
-                    '\'' + o['type'] + '\',' \
+                    '\'' + o['dltype'] + '\',' \
                     '\'' + o['updateAt'] + '\'' \
                     ')'
         logging.debug('插入btc历史交易')

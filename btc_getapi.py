@@ -13,39 +13,68 @@ last_vol_delta=0
 
 def api_market():
     global last_vol_delta
-    resHttpText = mHTTP.spyHTTP3(p_url='https://api.btctrade.com/api/ticker?coin=btc',p_machinetype='h5')
+    resHttpText = mHTTP.spyHTTP3(p_url='http://api.huobi.com/staticmarket/ticker_btc_json.js',p_machinetype='h5')
     if type(resHttpText) is int:
         logger.debug('http异常')
-    constct_json = json.loads(resHttpText, encoding='utf-8')
-    constct_json['updateAt']=mUtil.UTCtoSTDStamp(constct_json['time'])
-
-    if last_vol_delta==0:
-        last_vol_delta=constct_json['vol']
-        constct_json['vol_delta']=0
     else:
-        constct_json['vol_delta']=constct_json['vol']-last_vol_delta
-        last_vol_delta=constct_json['vol']
-    sdb.sBtcMarkInsert(constct_json)
+        constct_json = json.loads(resHttpText, encoding='utf-8')
+        o={}
+        o['time']=int(constct_json['time'])
+        o['last']=constct_json['ticker']['last']
+        o['vol']=int(constct_json['ticker']['vol'])
+        o['vol_delta']=0
+        o['updateAt']=mUtil.UTCtoSTDStamp(o['time'])
+        sdb.sBtcMarkInsert(o)
 
-def api_dealhis():
-    resHttpText = mHTTP.spyHTTP3(p_url='https://api.btctrade.com/api/trades?coin=btc',p_machinetype='h5')
+
+
+
+
+def api_k5():
+    resHttpText = mHTTP.spyHTTP3(p_url='http://api.huobi.com/staticmarket/btc_kline_005_json.js',p_machinetype='h5')
     if type(resHttpText) is int:
         logger.debug('http异常')
-    constct_json = json.loads(resHttpText, encoding='utf-8')
-    for i in range(len(constct_json)):
-        constct_json[i]['date']=int(constct_json[i]['date'])
-        constct_json[i]['updateAt']=mUtil.UTCtoSTDStamp(constct_json[i]['date'])
-        sdb.sBtcDealHis(constct_json[i])
+    else:
+        constct_json = json.loads(resHttpText, encoding='utf-8')
+        for i in range(len(constct_json)):
+            o={}
+            o['ddtime']=constct_json[i][0]
+            o['open']=constct_json[i][1]
+            o['high']=constct_json[i][2]
+            o['low']=constct_json[i][3]
+            o['close']=constct_json[i][4]
+            o['vol']=constct_json[i][5]
+            sdb.sBtcMarkK5(o)
+
+#utc,price,amount,tid,dltype,updateAt
+def api_dealhis():
+    resHttpText = mHTTP.spyHTTP3(p_url='http://api.huobi.com/staticmarket/detail_btc_json.js',p_machinetype='h5')
+    if type(resHttpText) is int:
+        logger.debug('http异常')
+    else:
+        constct_json = json.loads(resHttpText, encoding='utf-8')
+        const_trades=constct_json['trades']
+        for i in range(len(const_trades)):
+            o={}
+            o['utc']=str(const_trades[i]['ts'])
+            o['price']=const_trades[i]['price']
+            o['amount']=const_trades[i]['amount']
+            o['tid']=str(const_trades[i]['tradeId'])
+            o['dltype']=const_trades[i]['direction']
+            o['updateAt']=mUtil.UTCtoSTDStamp(int(o['utc'])/1000)
+            sdb.sBtcDealHis(o)
 
 
 api_market()
+api_k5()
 api_dealhis()
 
-crinterval=15 #15秒
+crinterval=30 #15秒
 
 while True:
     Timer(crinterval, api_market,()).start()
     Timer(crinterval, api_dealhis,()).start()
-    logger.debug('wait 15 secs to trigger ')
+    Timer(crinterval, api_k5,()).start()
+    logger.debug('wait '+str(crinterval)+' secs to trigger ')
     time.sleep(crinterval)
 
