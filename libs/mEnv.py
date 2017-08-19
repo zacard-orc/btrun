@@ -31,7 +31,7 @@ env_dbinfo={
         'db_passwd':'123',
         'db_name':'stock',
         'db_port':3306,
-        'db_charset':'utf8mb4',
+        'db_charset':'utf8',
         'db_conn_num':3
     },
     'test':{
@@ -40,7 +40,7 @@ env_dbinfo={
         'db_passwd': '123',
         'db_name': 'stock',
         'db_port': 3306,
-        'db_charset': 'utf8mb4',
+        'db_charset': 'utf8',
         'db_conn_num': 3
     },
     'work':{
@@ -49,7 +49,7 @@ env_dbinfo={
         'db_passwd': '123',
         'db_name': 'stock',
         'db_port': 3306,
-        'db_charset': 'utf8mb4',
+        'db_charset': 'utf8',
         'db_conn_num': 3
     },
 }
