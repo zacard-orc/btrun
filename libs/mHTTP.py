@@ -79,13 +79,13 @@ def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='g
     }
     try:
         if p_mehtod=='get':
-            r = requests.get(p_url,headers=myheaders,timeout=5)
+            r = requests.get(p_url,headers=myheaders,timeout=5,verify=False)
             logging.debug(r.url)
         if p_mehtod=='post':
-            r = requests.get(p_url, headers=myheaders, timeout=5)
+            r = requests.get(p_url, headers=myheaders, timeout=5,verify=False)
             logging.debug(r.url)
         if p_mehtod=='head':
-            r = requests.head(p_url, headers=myheaders, timeout=5)
+            r = requests.head(p_url, headers=myheaders, timeout=5,verify=False)
             logging.debug(r.url)
     except requests.exceptions.ConnectionError,fe:
         logging.error('HTTPERROR/'+str(fe.message))
