@@ -38,8 +38,8 @@ class A_SDB:
 
     def sbtc_loadk5(self,o):
         self.sql='select * from btc_market_k5 where ' \
-                 'acct=\'' + o +'\''
-        logging.debug('根据acct查询账户记录')
+                 'ddtime >= \'' + o['sttime_flag'] +'\' order by ddtime'
+        logging.debug('读取K5 30*5分钟内记录')
         return self.OpsSql()
 
 

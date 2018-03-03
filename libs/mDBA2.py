@@ -37,30 +37,134 @@ class A_SDB:
     def __init__(self):
         self.sql=''
 
+    # Load
+    def sLoadKLine(self,o):
+        self.sql='select * from wb_kline where kp=\''+o['kp']+'\'' \
+                 ' and kutc > date_add(now(),interval -60 minute)   ' \
+                 ' and tp='+o['tp']+' order by kutc desc'
+        return self.OpsSql()
 
+    def sLoadKLineForPolicyBase(self,o):
+        self.sql='select * from wb_kline where kp=\''+o['kp']+'\'' \
+                 ' and kutc > date_add(now(),interval -10 minute)   ' \
+                 '  order by kutc desc'
+        return self.OpsSql()
 
-    def sBtcMarkInsert(self,o):
-        self.sql = 'insert into btc_market_live(utc,last,vol,vol_delta,updateAt) values (' \
-                   '' + str(o['time']) +',' \
-                    '' + str(o['last']) + ',' \
+    # OpsTrade
+    def sBtcInsertOps(self,o):
+        self.sql='insert into wb_ops(exn,kp,ddtime,price,vol,direction,profit,rea,pol_name,para) values(' \
+                    '\''+o['exn']+'\',' \
+                    '\''+o['kp']+'\',' \
+                    '\''+o['ddtime']+'\',' \
+                    '' + str(o['price']) + ',' \
                     '' + str(o['vol']) + ',' \
-                    '' + str(o['vol_delta']) + ',' \
-                    '\'' + o['updateAt'] + '\'' \
+                    '\'' + str(o['direction'])+ '\', ' \
+                    '' + str(o['profit']) + ',' \
+                    '\''+o['rea']+'\',' \
+                    '\''+o['pol_name']+'\',' \
+                    '\''+o['para']+'\'' \
+                    ')'
+        self.DMLSql(logflag=False)
+
+    def sBtcLoadLastOps(self,o):
+        self.sql='select * from wb_ops where exn=' \
+                    '\''+o['exn']+'\' and kp=' \
+                    '\''+o['kp']+'\' and ddtime > date_add(now(),interval -24 hour) order by ddtime desc limit 1'
+        return self.OpsSql()
+
+
+    # Insert Or Update
+    def sBtcMarkInsert(self,o):
+        self.sql = 'replace into wb_new_his values (' \
+                    '\''+o['exn']+'\',' \
+                    '\''+o['kp']+'\',' \
+                    '\''+o['kutc']+'\',' \
+                    '' + str(o['price']) + ',' \
+                    '' + str(o['b1_p']) + ',' \
+                    '' + str(o['b1_a']) + ',' \
+                    '' + str(o['s1_p']) + ',' \
+                    '' + str(o['s1_a']) + '' \
                     ')'
         logging.debug('插入btc实时行情')
         self.DMLSql()
 
-    def sBtcMarkK5(self,o):
-        self.sql = 'replace into btc_market_k5(ddtime,open,high,low,close,vol) values (' \
-                   '\'' + o['ddtime'] +'\',' \
-                    '' + str(o['open']) + ',' \
-                    '' + str(o['high']) + ',' \
-                    '' + str(o['low']) + ',' \
-                    '' + str(o['close']) + ',' \
-                    '' + str(o['vol']) + '' \
-                     ')'
-        logging.debug('插入btc k5行情')
-        self.DMLSql(logflag=False)
+    def sBtcMarkAccInsert(self,o):
+        self.sql = 'replace into wb_kline_acc values (' \
+                    '\''+o['exn']+'\',' \
+                    '\''+o['kp']+'\',' \
+                    '\''+o['kutc']+'\',' \
+                    '' + str(o['buy_a']) + ',' \
+                    '' + str(o['sell_a']) + ',' \
+                    '' + str(o['sw']) + ',' \
+                    '' + str(o['buy_big_a']) + ',' \
+                    '' + str(o['sell_big_a']) + '' \
+                    ')'
+        logging.debug('插入btc明细单量、换手、大单量统计')
+        self.DMLSql()
+
+    def sBtcMarkKline(self,o):
+        self.sql = 'replace into wb_kline ' \
+                   ' values (' \
+                    '\''+o['exn']+'\',' \
+                    '\''+o['kp']+'\',' \
+                    '\''+o['kutc']+'\','\
+                    +str(o['close'])+','\
+                    +str(o['p_ma5']) + ','\
+                    + str(o['p_ma30']) + ',' \
+                    + str(o['p_ma60']) + ',' \
+                    + str(o['angle_v_ma5']) + ','\
+                     + str(o['angle_v_ma30']) + ',' \
+                     + str(o['angle_v_ma60']) + ',' \
+                     + str(o['his_high']) + ',' \
+                     + str(o['his_low']) + ',now())'
+                     # + str(o['b1_p']) + ',' \
+                     # + str(o['b1_a']) + ',' \
+                     # + str(o['s1_p']) + ',' \
+                     # + str(o['s1_a']) + ',now())'
+        logging.debug('插入 '+str(o['kp'])+'行情')
+        self.DMLSql(logflag=True)
+
+    def sUsdtMarketInsert(self,o):
+        self.sql = 'replace into wb_usdt ' \
+                   ' values (' \
+                    '\''+o['exn']+'\',' \
+                    '\''+o['kutc']+'\','\
+                    +str(o['sort_id'])+','\
+                    '\''+o['direction']+'\','\
+                    + str(o['price']) + ',' \
+                    + str(o['r_min']) + ',' \
+                    + str(o['r_max']) + ',now())'
+        logging.debug('插入 USDT行情')
+        self.DMLSql(logflag=True)
+
+    def sBtcMarkKlineMAUpdate(self,o):
+        self.sql = 'update wb_kline set ' \
+                    'p_ma5=' + str(o['p_ma5']) + ',' \
+                    'p_ma10=' + str(o['p_ma10']) + ',' \
+                    'p_ma20=' + str(o['p_ma20']) + ',' \
+                    'p_ma30=' + str(o['p_ma30']) + ',' \
+                    'v_ma5=' + str(o['v_ma5']) + ',' \
+                    'v_ma10=' + str(o['v_ma10']) + ' ' \
+                    ' where exn=' \
+                    '\''+o['exn']+'\' and tp=' \
+                    '\''+o['tp']+'\' and kp=' \
+                    '\''+o['kp']+'\' and kutc=' \
+                    '\''+o['kutc']+'\''
+        logging.debug('更新虚拟币 k'+str(o['tp'])+'的MA')
+        self.DMLSql(logflag=True)
+
+    def sBtcMarkKlineMACDUpdate(self,o):
+        self.sql = 'update wb_kline set ' \
+                    'dif=' + str(o['dif']) + ', ' \
+                    'dea=' + str(o['dea']) + ', ' \
+                    'macd=' + str(o['macd']) + ' ' \
+                    ' where exn=' \
+                    '\''+o['exn']+'\' and tp=' \
+                    '\''+o['tp']+'\' and kp=' \
+                    '\''+o['kp']+'\' and kutc=' \
+                    '\''+o['kutc']+'\''
+        logging.debug('更新虚拟币 k'+str(o['tp'])+'的MACD')
+        self.DMLSql(logflag=True)
 
     def sBtcDealHis(self,o):
         self.sql = 'replace into btc_market_dealhis(utc,price,amount,tid,dltype,updateAt) values (' \

@@ -25,41 +25,68 @@ env_redis={
 }
 
 env_dbinfo={
-    'dev':{
-        'db_host':'127.0.0.1',
+   'dev':{
+        # gongsi basic
+        # 'db_host':'rm-bp13779hov3wrck4go.mysql.rds.aliyuncs.com',
+        # 'db_port': 3306,
+
+        # mengzhao basic
+        # 'db_host':'47.96.10.189',
+        # 'db_port': 13821,
+        # 'db_user':'stock',
+        # 'db_passwd':'123',
+
+        # heiyu out basic
+        # 'db_host':'120.27.216.222',
+        # 'db_port': 13821,
+        # 'db_user':'stock',
+        # 'db_passwd':'123',
+        'db_host':'47.96.10.189',
+        'db_port': 13821,
+        'db_user':'stock',
+        'db_passwd':'123',
+
+        'db_name':'stock',
+        'db_charset':'utf8mb4',
+        'db_conn_num':5
+    },
+    'test':{
+        'db_host': 'rm-bp13779hov3wrck4go.mysql.rds.aliyuncs.com',
+        'db_user': 'stock',
+        'db_passwd': '123',
+        'db_name': 'stock',
+        'db_port': 3306,
+        'db_charset': 'utf8mb4',
+        'db_conn_num': 3
+    },
+     'work':{
+        'db_host': 'rm-bp1rqx1ig1rzp85v0.mysql.rds.aliyuncs.com',
+        'db_user': 'stock',
+        'db_passwd': '123',
+        'db_name': 'stock',
+        'db_port': 3306,
+        'db_charset': 'utf8mb4',
+        'db_conn_num': 5
+    },
+     'work_out':{
+        'db_host':'47.96.10.189',
+        'db_port': 13821,
         'db_user':'stock',
         'db_passwd':'123',
         'db_name':'stock',
-        'db_port':3306,
-        'db_charset':'utf8',
-        'db_conn_num':3
+        'db_charset':'utf8mb4',
+        'db_conn_num':5
     },
-    'test':{
-        'db_host': '127.0.0.1',
-        'db_user': 'stock',
-        'db_passwd': '123',
-        'db_name': 'stock',
-        'db_port': 3306,
-        'db_charset': 'utf8',
-        'db_conn_num': 3
-    },
-    'work':{
-        'db_host': '115.238.54.181',
-        'db_user': 'stock',
-        'db_passwd': '123',
-        'db_name': 'stock',
-        'db_port': 3306,
-        'db_charset': 'utf8',
-        'db_conn_num': 3
-    },
-    'ana':{
-            'db_host': '115.238.54.181',
-            'db_user': 'stock',
-            'db_passwd': '123',
-            'db_name': 'stock',
-            'db_port': 3306,
-            'db_charset': 'utf8',
-            'db_conn_num': 3
+     'work_hy':{
+        # 'db_host':'rm-bp1p10y33k41b2u94.mysql.rds.aliyuncs.com',
+        # 'db_port': 3306,
+        'db_host':'47.96.10.189',
+        'db_port': 13821,
+        'db_user':'stock',
+        'db_passwd':'123',
+        'db_name':'stock',
+        'db_charset':'utf8mb4',
+        'db_conn_num':5
     }
 
 }

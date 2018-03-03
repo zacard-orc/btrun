@@ -23,29 +23,13 @@ from PIL import Image
 urllib2.socket.setdefaulttimeout(10)
 
 
-
-def taskHTTP():
-    taskIPEnv=os.getenv('SPY_ENV')
-    print taskIPEnv
-    if(taskIPEnv=='test'):
-        conn = httplib.HTTPConnection("121.40.149.142",5000,False,5)
-        #conn = httplib.HTTPConnection("121.40.149.142",5000,False,5)
-    else:
-        conn = httplib.HTTPConnection("121.40.149.142",5000,False,5)
-    try:
-        conn.request("GET",'/task')
-        res = conn.getresponse()
-        res_str=res.read()
-        logging.debug('GetTask/'+str(res.status)+'/'+res_str)
-        return json.loads(res_str)
-    except Exception as e:
-        logging.debug(e.message)
-        return 'error'
+sess = requests.session()
+sess.keep_alive = True
 
 
-
-def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='get'):
+def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='get',p_data=None,p_header=None):
     FateIp=mUtil.genFateIP()
+    print p_url
     logging.debug('Moni:'+FateIp+'/Now Spying/'+p_url)
     '''
     mypayload = {
@@ -77,15 +61,21 @@ def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='g
         'Referer':p_referer,
         'Cookie':mUtil.getMyCookie()
     }
+
+    if p_header is not None:
+        for k in p_header:
+            myheaders[k]=p_header[k]
+
+
     try:
         if p_mehtod=='get':
-            r = requests.get(p_url,headers=myheaders,timeout=5,verify=False)
+            r = sess.get(p_url,headers=myheaders,timeout=5)
             logging.debug(r.url)
         if p_mehtod=='post':
-            r = requests.get(p_url, headers=myheaders, timeout=5,verify=False)
+            r = sess.post(p_url, headers=myheaders, timeout=5,data=p_data)
             logging.debug(r.url)
         if p_mehtod=='head':
-            r = requests.head(p_url, headers=myheaders, timeout=5,verify=False)
+            r = sess.head(p_url, headers=myheaders, timeout=5)
             logging.debug(r.url)
     except requests.exceptions.ConnectionError,fe:
         logging.error('HTTPERROR/'+str(fe.message))

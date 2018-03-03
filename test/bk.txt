@@ -1,0 +1,23 @@
+# kp_coin=['btcusdt','ethusdt','bchusdt','etcusdt','ltcusdt','eosusdt','xrpusdt','dashusdt',
+#              'nasusdt','htusdt','hsrusdt','qtumusdt','iostusdt','neousdt','sntusdt',
+#              'elaeth','chateth','thetaeth','mdseth','omgeth','ocneth']
+#
+#
+# if os.getenv('PYVV')=='work':
+#     kp_coin=['btcusdt','ethusdt','bchusdt','etcusdt','ltcusdt','eosusdt','xrpusdt','dashusdt',
+#              'nasusdt','htusdt','hsrusdt','qtumusdt','iostusdt']
+#
+# if os.getenv('PYVV')=='work_out':
+#     kp_coin=['neousdt','sntusdt','elaeth','chateth','thetaeth','mdseth','omgeth','ocneth']
+#
+
+# def runCollect2(in_kp):
+#     try:
+#         ko1=api_kline(tp=5,kp=in_kp)
+#         ko2=api_merged(in_kp)
+#         # api_dealhis(kp_coin[i])
+#         dictMerged1 = dict(ko1.items() + ko2.items())
+#         dictMerged1['kutc']=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:00')
+#         insdb.sBtcMarkKline(dictMerged1)
+#     except Exception,e:
+#         logger.debug('[OHS]' + traceback.format_exc())
