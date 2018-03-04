@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-# btctrade
+# 火币
 
 from __future__ import division
 import os,json,sys,time,xml,datetime,traceback,thread
@@ -33,7 +33,12 @@ p_base={
     'eth':1
 }
 kp_coin=[]
-kp_scale=5
+kp_coin_uniq={}
+# kp_coin=['btcusdt','ethusdt','bchusdt','etcusdt','ltcusdt','eosusdt','xrpusdt','dashusdt',
+#              'nasusdt','htusdt','hsrusdt','qtumusdt','iostusdt','neousdt','sntusdt',
+#              'elaeth','chateth','thetaeth','mdseth','omgeth','storjusdt'
+#     ,'ocneth','itceth','dgdeth','evxeth','btmeth']
+kp_scale=6
 
 def wh():
     base_url='https://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote'
@@ -96,7 +101,7 @@ def api_kline(tp=5,kp='btcusdt'):
     if tp==3600:
         perd='1day'
 
-    base_url=dom_url+'/market/history/kline?period='+perd+'&size=2000&symbol='+kp
+    base_url=dom_url+'/market/history/kline?period='+perd+'&size=70&symbol='+kp
 
     resHttpText = mHTTP.spyHTTP3(p_url=base_url)
     if type(resHttpText) is int:
@@ -133,6 +138,8 @@ def api_kline(tp=5,kp='btcusdt'):
 
     for i in range(len(ma_raw)):
 
+        if i>5:
+            continue
         p_ma5_list=[]
         p_ma30_list=[]
         p_ma60_list=[]
@@ -185,13 +192,17 @@ def api_kline(tp=5,kp='btcusdt'):
     rtn_o['his_high']=max(his_high)
     rtn_o['his_low']=min(his_low)
 
+    dps=api_depth(kp)
+    rtn_o['buy_q']=dps[0]
+    rtn_o['sell_q']=dps[1]
+
     return rtn_o
 
 
 
 
 def api_dealhis(kp='btcusdt'):
-    base_url=dom_url+'/market/history/trade?size=50&symbol='+kp
+    base_url=dom_url+'/market/history/trade?size=30&symbol='+kp
 
     resHttpText = mHTTP.spyHTTP3(p_url=base_url,p_machinetype='h5')
     if type(resHttpText) is int:
@@ -286,10 +297,34 @@ def api_commtxpair():
 
     rtn=json.loads(resHttpText)
     rtn=rtn['data']
+
+    #usdt一遍
     for j in range(len(rtn)):
-        #base-currency,quote-currency
-        if mUtil.u8(rtn[j]['quote-currency'])!='btc':
-            kp_coin.append(mUtil.u8(rtn[j]['base-currency'])+mUtil.u8(rtn[j]['quote-currency']))
+        if mUtil.u8(rtn[j]['quote-currency'])=='usdt':
+            kp_coin.append(mUtil.u8(rtn[j]['base-currency']) + mUtil.u8(rtn[j]['quote-currency']))
+            kp_coin_uniq[mUtil.u8(rtn[j]['base-currency'])] = True
+
+    #eth一遍
+    for j in range(len(rtn)):
+        if mUtil.u8(rtn[j]['quote-currency'])=='eth':
+            if kp_coin_uniq.has_key(mUtil.u8(rtn[j]['base-currency'])):
+                logger.debug('skip kp')
+            else:
+                kp_coin.append(mUtil.u8(rtn[j]['base-currency'])+mUtil.u8(rtn[j]['quote-currency']))
+                kp_coin_uniq[mUtil.u8(rtn[j]['base-currency'])]=True
+
+    #btc一遍
+    for j in range(len(rtn)):
+        if mUtil.u8(rtn[j]['quote-currency'])=='btc':
+            if kp_coin_uniq.has_key(mUtil.u8(rtn[j]['base-currency'])):
+                logger.debug('skip kp')
+            else:
+                kp_coin.append(mUtil.u8(rtn[j]['base-currency'])+mUtil.u8(rtn[j]['quote-currency']))
+                kp_coin_uniq[mUtil.u8(rtn[j]['base-currency'])]=True
+
+        # #base-currency,quote-currency
+        # if mUtil.u8(rtn[j]['quote-currency'])!='btc':
+
         # print kp_coin[-1]
 
 
@@ -351,11 +386,38 @@ def api_otcusdt():
         o['r_max'] = rtn[i]['maxTradeLimit']
         insdb.sUsdtMarketInsert(o)
 
+def api_depth(kp='btcusdt'):
+    base_url = dom_url + '/market/depth?symbol='+kp+'&type=step5'
+    resHttpText = mHTTP.spyHTTP3(p_url=base_url)
 
+    if type(resHttpText) is int:
+        logger.debug('http异常')
+        return -1
+
+    rtn=json.loads(resHttpText)
+    if rtn['status']<>u'ok':
+        return -2
+
+    data=rtn['tick']
+
+    #买盘
+    bids_data=data['bids']
+    bsum=0
+    for i in range(len(bids_data)):
+        bsum+=bids_data[i][1]
+
+    # 卖盘
+    asks_data = data['asks']
+    asum = 0
+    for i in range(len(asks_data)):
+        asum += asks_data[i][1]
+    return (bsum,asum)
 
 wh() #外汇
 api_commtxpair()
+api_depth()
 
+time.sleep(1)
 
 # print len(kp_coin)
 # for i in range(len(kp_coin)):
@@ -367,14 +429,15 @@ logger.debug(os.getenv('PYVV'))
 if os.getenv('PYVV')=='work_hy':
     while True:
         try:
-            if int(sys.argv[1])==0:
+            if int(sys.argv[1])<=2:
                 logger.debug('标记为0的过滤USDT')
+                wh()
                 api_otcusdt()
             runCollect()
             time.sleep(5)
         except Exception,e:
             logger.debug('[OHS]' + traceback.format_exc())
-            time.sleep(5)
+            # time.sleep(5)
 
 
 

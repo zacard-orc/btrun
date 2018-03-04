@@ -116,7 +116,10 @@ class A_SDB:
                      + str(o['angle_v_ma30']) + ',' \
                      + str(o['angle_v_ma60']) + ',' \
                      + str(o['his_high']) + ',' \
-                     + str(o['his_low']) + ',now())'
+                     + str(o['his_low']) + ',' \
+                     + str(o['buy_q']) + ',' \
+                     + str(o['sell_q']) + ',' \
+                     'now())'
                      # + str(o['b1_p']) + ',' \
                      # + str(o['b1_a']) + ',' \
                      # + str(o['s1_p']) + ',' \
