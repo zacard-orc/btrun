@@ -21,3 +21,50 @@
 #         insdb.sBtcMarkKline(dictMerged1)
 #     except Exception,e:
 #         logger.debug('[OHS]' + traceback.format_exc())
+
+
+
+/home/wb/btc/btc_getapi2.log {
+    daily
+    rotate 1
+    create
+    dateext
+    notifempty
+    missingok
+}
+
+/home/wb/btc/btc_getapi3.log {
+    daily
+    rotate 1
+    create
+    dateext
+    notifempty
+    missingok
+}
+
+/home/wb/btc/btc_getapi4.log {
+    daily
+    rotate 1
+    create
+    dateext
+    notifempty
+    missingok
+}
+
+/home/wb/btc/btc_getapi5.log {
+    daily
+    rotate 1
+    create
+    dateext
+    notifempty
+    missingok
+}
+
+/home/wb/btc/btc_getapi6.log {
+    daily
+    rotate 1
+    create
+    dateext
+    notifempty
+    missingok
+}

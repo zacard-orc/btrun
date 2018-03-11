@@ -13,7 +13,6 @@ import mUtil,mEnv
 from PIL import Image
 
 
-
 # logging.basicConfig(filename = os.path.join(os.getcwd()+'/logs/',sys.argv[1]+'.log'),
 #                     level = logging.DEBUG,
 #                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s <%(funcName)s> %(message)s',
@@ -69,13 +68,13 @@ def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='g
 
     try:
         if p_mehtod=='get':
-            r = sess.get(p_url,headers=myheaders,timeout=5)
+            r = sess.get(p_url,headers=myheaders,timeout=5,verify=False)
             logging.debug(r.url)
         if p_mehtod=='post':
-            r = sess.post(p_url, headers=myheaders, timeout=5,data=p_data)
+            r = sess.post(p_url, headers=myheaders, timeout=5,data=p_data,verify=False)
             logging.debug(r.url)
         if p_mehtod=='head':
-            r = sess.head(p_url, headers=myheaders, timeout=5)
+            r = sess.head(p_url, headers=myheaders, timeout=5,verify=False)
             logging.debug(r.url)
     except requests.exceptions.ConnectionError,fe:
         logging.error('HTTPERROR/'+str(fe.message))

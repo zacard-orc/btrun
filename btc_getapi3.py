@@ -14,7 +14,7 @@ logger = mBusiLog.myLog(os.path.basename(__file__).split('.')[0] + '.log')
 last_vol_delta=0
 
 # base para
-dom_url='https://www.okex.com'
+dom_url='http://www.okex.com'
 AccessKeyId='08f4bb11-da3cb5d9-81292c66-f7372'
 SignatureMethod='HmacSHA256'
 SignatureVersion='2'
@@ -38,7 +38,7 @@ kp_coin_uniq={}
 #              'nasusdt','htusdt','hsrusdt','qtumusdt','iostusdt','neousdt','sntusdt',
 #              'elaeth','chateth','thetaeth','mdseth','omgeth','storjusdt'
 #     ,'ocneth','itceth','dgdeth','evxeth','btmeth']
-kp_scale=3
+kp_scale=4
 
 
 
@@ -74,7 +74,7 @@ def api_kline(tp=5,kp='btc_usdt'):
     if tp==3600:
         perd='1day'
 
-    base_url=dom_url+'/api/v1/kline.do?symbol='+kp+'&type=5min'
+    base_url=dom_url+'/api/v1/kline.do?symbol='+kp+'&type=5min&size=80'
 
     resHttpText = mHTTP.spyHTTP3(p_url=base_url)
     if type(resHttpText) is int:
@@ -220,6 +220,8 @@ def api_dealhis(kp='btc_usdt'):
                 else:
                     oa[ntime][2]=-oa[ntime][1]/oa[ntime][0]
 
+    dst = datetime.datetime.now() + datetime.timedelta(minutes=-1)
+    dst = dst.strftime("%Y-%m-%d %H:%M")
     for m in oa:
         # print m,oa[m]
         idb={}
@@ -231,7 +233,9 @@ def api_dealhis(kp='btc_usdt'):
         idb['sw']=oa[m][2]
         idb['buy_big_a']=oa[m][3]
         idb['sell_big_a']=oa[m][4]
-        insdb.sBtcMarkAccInsert(idb)
+        if m>=dst:
+            insdb.sBtcMarkAccInsert(idb)
+        # insdb.sBtcMarkAccInsert(idb)
     # dst = datetime.datetime.now() + datetime.timedelta(minutes=-1)
     # dst = dst.strftime('%Y-%m-%d %H:%M')
     # rtn_o={}
@@ -279,6 +283,9 @@ def runCollect():
         logger.warn('第二入参不存在')
 
 
+
+
+
 def api_depth(kp='btc_usdt'):
     base_url = dom_url + '/api/v1/depth.do?symbol='+kp
     resHttpText = mHTTP.spyHTTP3(p_url=base_url)
@@ -305,8 +312,12 @@ def api_depth(kp='btc_usdt'):
         asum += asks_data[i][1]
     return (bsum,asum)
 
+
 api_commtxpair()
-# api_depth()
+# print api_kline()
+#
+# time.sleep(3333)
+# # api_depth()
 
 # logger.debug(str(kp_coin))
 

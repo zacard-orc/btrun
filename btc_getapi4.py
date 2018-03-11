@@ -1,22 +1,20 @@
 # -*- coding:utf-8 -*-
-# 火币
+# ZB
 
 from __future__ import division
 import os,json,sys,time,xml,datetime,traceback,thread
 import numpy as np
 from libs import mHTTP, mBusiLog, mUtil, mEnv, mDBA2
 from bs4 import  BeautifulSoup
-# import ssl
-# context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_0)
 
-# time.sleep(111)
+
 
 insdb = mDBA2.A_SDB()
 logger = mBusiLog.myLog(os.path.basename(__file__).split('.')[0] + '.log')
 last_vol_delta=0
 
 # base para
-dom_url='http://api.huobi.pro'
+dom_url='http://api.zb.com'
 AccessKeyId='08f4bb11-da3cb5d9-81292c66-f7372'
 SignatureMethod='HmacSHA256'
 SignatureVersion='2'
@@ -40,7 +38,7 @@ kp_coin_uniq={}
 #              'nasusdt','htusdt','hsrusdt','qtumusdt','iostusdt','neousdt','sntusdt',
 #              'elaeth','chateth','thetaeth','mdseth','omgeth','storjusdt'
 #     ,'ocneth','itceth','dgdeth','evxeth','btmeth']
-kp_scale=5
+kp_scale=4
 
 def wh():
     base_url='https://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote'
@@ -94,7 +92,7 @@ def api_merged(kp='btcusdt'):
 
 
 
-def api_kline(tp=5,kp='btcusdt'):
+def api_kline(tp=5,kp='btc_usdt'):
     perd=''
     if tp==1:
         perd='1min'
@@ -103,17 +101,13 @@ def api_kline(tp=5,kp='btcusdt'):
     if tp==3600:
         perd='1day'
 
-    base_url=dom_url+'/market/history/kline?period='+perd+'&size=70&symbol='+kp
+    base_url=dom_url+'/data/v1/kline?market='+kp+'&type=5min&size=80'
 
     resHttpText = mHTTP.spyHTTP3(p_url=base_url)
     if type(resHttpText) is int:
         logger.debug('http异常')
         return -1
     rtn=json.loads(resHttpText,encoding='utf-8')
-    if rtn['status']<>u'ok':
-        logger.debug('http异常')
-        return -2
-
 
     data=rtn['data']
 
@@ -123,20 +117,23 @@ def api_kline(tp=5,kp='btcusdt'):
     for i in range(len(data)):
         # print data[i]
         o={}
-        o['exn']='HB'
+        o['exn']='ZB'
         o['tp']=str(tp)
         o['kp']=kp
-        o['kutc']=mUtil.UTCtoSTDStamp(data[i]['id'])
-        o['amount']=data[i]['amount'] #成交量
-        o['count']=data[i]['count'] #笔数
-        o['vol']=data[i]['vol'] #成交额
-        o['high']=data[i]['high']
-        o['low']=data[i]['low']
-        o['open']=data[i]['open']
-        o['close']=data[i]['close']
+        o['kutc']=mUtil.UTCtoSTDStamp(data[i][0]/1000)
+        # o['amount']=data[i]['amount'] #成交量
+        # o['count']=data[i]['count'] #笔数
+        # o['vol']=data[i]['vol'] #成交额
+        o['high']=data[i][2]
+        o['low']=data[i][3]
+        o['open']=data[i][1]
+        o['close']=data[i][4]
         ma_raw.append(o)
         his_high.append(o['high'])
         his_low.append(o['low'])
+
+
+    ma_raw.reverse()
 
     for i in range(len(ma_raw)):
 
@@ -183,7 +180,7 @@ def api_kline(tp=5,kp='btcusdt'):
 
     rtn_o={}
     rtn_o['kp']=kp
-    rtn_o['exn']='HB'
+    rtn_o['exn']='ZB'
     rtn_o['p_ma5']=ma_raw[0]['p_ma5']
     rtn_o['p_ma30']=ma_raw[0]['p_ma30']
     rtn_o['p_ma60']=ma_raw[0]['p_ma60']
@@ -194,6 +191,7 @@ def api_kline(tp=5,kp='btcusdt'):
     rtn_o['his_high']=max(his_high)
     rtn_o['his_low']=min(his_low)
 
+    time.sleep(1)
     dps=api_depth(kp)
     rtn_o['buy_q']=dps[0]
     rtn_o['sell_q']=dps[1]
@@ -203,8 +201,8 @@ def api_kline(tp=5,kp='btcusdt'):
 
 
 
-def api_dealhis(kp='btcusdt'):
-    base_url=dom_url+'/market/history/trade?size=300&symbol='+kp
+def api_dealhis(kp='btc_usdt'):
+    base_url=dom_url+'/data/v1/trades?market='+kp
 
     resHttpText = mHTTP.spyHTTP3(p_url=base_url,p_machinetype='h5')
     if type(resHttpText) is int:
@@ -212,57 +210,51 @@ def api_dealhis(kp='btcusdt'):
         return -1
 
     rtn=json.loads(resHttpText)
-    if rtn['status']<>u'ok':
-        return -2
 
-    data=rtn['data']
+    udata=rtn
     oa={}
-    for i in range(len(data)):
-        udata=data[i]['data']
-        for j in range(len(udata)):
-            ntime=mUtil.UTCtoSTDStamp(udata[j]['ts']/1000)[:16]
-            # print udata[j]
+    for j in range(len(udata)):
+        ntime=mUtil.UTCtoSTDStamp(udata[j]['date'])[:16]
+        # print udata[j]
 
-            if oa.has_key(ntime) is False:
-                oa[ntime] = [0,0,0,0,0]  #买量，卖量，买卖比，买大单，卖大单
+        if oa.has_key(ntime) is False:
+            oa[ntime] = [0,0,0,0,0]  #买量，卖量，买卖比，买大单，卖大单
 
-            accm=udata[j]['amount']*udata[j]['price']
-            accm_cny=10000
-            if kp[-4:]=='usdt': #则按usdt计价
-                accm_base=p_base['usdt']
-                accm=accm*accm_base
+        accm=float(udata[j]['amount'])*float(udata[j]['price'])
+        accm_cny=10000
+        if kp[-4:]=='usdt': #则按usdt计价
+            accm_base=p_base['usdt']
+            accm=accm*accm_base
+        else:
+            accm_base=p_base[kp[-3:]]
+            accm=accm*accm_base*p_base['usdt']
+
+
+        if udata[j]['type']==u'buy':
+            oa[ntime][0]+=float(udata[j]['amount'])
+            # if udata[j]['amount'] >= kp_coin_big[kp]:
+            if accm>=accm_cny:
+                oa[ntime][3] += float(udata[j]['amount'])
+        if udata[j]['type'] == u'sell':
+            oa[ntime][1] += float(udata[j]['amount'])
+            if accm>=accm_cny:
+                oa[ntime][4] += float(udata[j]['amount'])
+
+        if oa[ntime][1]==0:
+            oa[ntime][2]=0
+        else:
+            if oa[ntime][0] >= oa[ntime][1]:
+                oa[ntime][2]=oa[ntime][0]/oa[ntime][1]
             else:
-                accm_base=p_base[kp[-3:]]
-                accm=accm*accm_base*p_base['usdt']
-
-
-            if udata[j]['direction']==u'buy':
-                oa[ntime][0]+=udata[j]['amount']
-                # if udata[j]['amount'] >= kp_coin_big[kp]:
-                if accm>=accm_cny:
-                    oa[ntime][3] += udata[j]['amount']
-            if udata[j]['direction'] == u'sell':
-                oa[ntime][1] += udata[j]['amount']
-                if accm>=accm_cny:
-                    oa[ntime][4] += udata[j]['amount']
-
-            if oa[ntime][1]==0:
-                oa[ntime][2]=0
-            else:
-                if oa[ntime][0] >= oa[ntime][1]:
-                    oa[ntime][2]=oa[ntime][0]/oa[ntime][1]
+                if oa[ntime][0] == 0:
+                    oa[ntime][2] = 0
                 else:
-                    if oa[ntime][0] == 0:
-                        oa[ntime][2] = 0
-                    else:
-                        oa[ntime][2]=-oa[ntime][1]/oa[ntime][0]
+                    oa[ntime][2]=-oa[ntime][1]/oa[ntime][0]
 
-    dst = datetime.datetime.now() + datetime.timedelta(minutes=-1)
-    dst = dst.strftime("%Y-%m-%d %H:%M")
     for m in oa:
         # print m,oa[m]
         idb={}
-        idb['exn']='HB'
+        idb['exn']='ZB'
         idb['kp']=kp
         idb['kutc']=m+':00'
         idb['buy_a']=oa[m][0]
@@ -270,8 +262,7 @@ def api_dealhis(kp='btcusdt'):
         idb['sw']=oa[m][2]
         idb['buy_big_a']=oa[m][3]
         idb['sell_big_a']=oa[m][4]
-        if m>=dst:
-            insdb.sBtcMarkAccInsert(idb)
+        insdb.sBtcMarkAccInsert(idb)
     # dst = datetime.datetime.now() + datetime.timedelta(minutes=-1)
     # dst = dst.strftime('%Y-%m-%d %H:%M')
     # rtn_o={}
@@ -289,48 +280,58 @@ def api_dealhis(kp='btcusdt'):
 
 
 def api_commtxpair():
-    base_url=dom_url+'/v1/common/symbols'
+    base_url=dom_url+'/data/v1/markets'
 
     resHttpText = mHTTP.spyHTTP3(p_url=base_url,p_machinetype='h5')
     if type(resHttpText) is int:
         logger.debug('http异常')
         return -1
 
-    rtn=json.loads(resHttpText)
-    if rtn['status']<>u'ok':
-        return -2
 
     rtn=json.loads(resHttpText)
-    rtn=rtn['data']
+
+    for key in rtn:
+        if key.split('_')[1]==u'usdt':
+            kp_coin.append(mUtil.u8(key))
+            kp_coin_uniq[mUtil.u8(key.split('_')[0])]=True
+
+    # for key in rtn:
+    #     if key.split('_')[1] == u'qc':
+    #         if kp_coin_uniq.has_key(key.split('_')[0]) is False:
+    #             kp_coin.append(key)
+    #             kp_coin_uniq[key.split('_')[0]] = True
+
+    for key in rtn:
+        if key.split('_')[1] == u'btc':
+            if kp_coin_uniq.has_key(key.split('_')[0]) is False:
+                kp_coin.append(key)
+                kp_coin_uniq[key.split('_')[0]] = True
 
     #usdt一遍
-    for j in range(len(rtn)):
-        if mUtil.u8(rtn[j]['quote-currency'])=='usdt':
-            kp_coin.append(mUtil.u8(rtn[j]['base-currency']) + mUtil.u8(rtn[j]['quote-currency']))
-            kp_coin_uniq[mUtil.u8(rtn[j]['base-currency'])] = True
+    # for j in range(len(rtn)):
+    #     if mUtil.u8(rtn[j]['quote-currency'])=='usdt':
+    #         kp_coin.append(mUtil.u8(rtn[j]['base-currency']) + mUtil.u8(rtn[j]['quote-currency']))
+    #         kp_coin_uniq[mUtil.u8(rtn[j]['base-currency'])] = True
+    #
+    # #eth一遍
+    # for j in range(len(rtn)):
+    #     if mUtil.u8(rtn[j]['quote-currency'])=='eth':
+    #         if kp_coin_uniq.has_key(mUtil.u8(rtn[j]['base-currency'])):
+    #             logger.debug('skip kp')
+    #         else:
+    #             kp_coin.append(mUtil.u8(rtn[j]['base-currency'])+mUtil.u8(rtn[j]['quote-currency']))
+    #             kp_coin_uniq[mUtil.u8(rtn[j]['base-currency'])]=True
+    #
+    # #btc一遍
+    # for j in range(len(rtn)):
+    #     if mUtil.u8(rtn[j]['quote-currency'])=='btc':
+    #         if kp_coin_uniq.has_key(mUtil.u8(rtn[j]['base-currency'])):
+    #             logger.debug('skip kp')
+    #         else:
+    #             kp_coin.append(mUtil.u8(rtn[j]['base-currency'])+mUtil.u8(rtn[j]['quote-currency']))
+    #             kp_coin_uniq[mUtil.u8(rtn[j]['base-currency'])]=True
 
-    #eth一遍
-    for j in range(len(rtn)):
-        if mUtil.u8(rtn[j]['quote-currency'])=='eth':
-            if kp_coin_uniq.has_key(mUtil.u8(rtn[j]['base-currency'])):
-                logger.debug('skip kp')
-            else:
-                kp_coin.append(mUtil.u8(rtn[j]['base-currency'])+mUtil.u8(rtn[j]['quote-currency']))
-                kp_coin_uniq[mUtil.u8(rtn[j]['base-currency'])]=True
 
-    #btc一遍
-    for j in range(len(rtn)):
-        if mUtil.u8(rtn[j]['quote-currency'])=='btc':
-            if kp_coin_uniq.has_key(mUtil.u8(rtn[j]['base-currency'])):
-                logger.debug('skip kp')
-            else:
-                kp_coin.append(mUtil.u8(rtn[j]['base-currency'])+mUtil.u8(rtn[j]['quote-currency']))
-                kp_coin_uniq[mUtil.u8(rtn[j]['base-currency'])]=True
-
-        # #base-currency,quote-currency
-        # if mUtil.u8(rtn[j]['quote-currency'])!='btc':
-
-        # print kp_coin[-1]
 
 
 def runCollect():
@@ -367,7 +368,7 @@ def api_otcusdt():
     #sell
     for i in range(0,5):
         o={}
-        o['exn']='HB'
+        o['exn']='ZB'
         o['kutc']=dst
         o['sort_id']=i+1
         o['direction']='sell'
@@ -382,7 +383,7 @@ def api_otcusdt():
     rtn = rtn['data']
     for i in range(0, 5):
         o = {}
-        o['exn'] = 'HB'
+        o['exn'] = 'ZB'
         o['kutc'] = dst
         o['sort_id'] = i + 1
         o['direction'] = 'buy'
@@ -391,8 +392,8 @@ def api_otcusdt():
         o['r_max'] = rtn[i]['maxTradeLimit']
         insdb.sUsdtMarketInsert(o)
 
-def api_depth(kp='btcusdt'):
-    base_url = dom_url + '/market/depth?symbol='+kp+'&type=step5'
+def api_depth(kp='btc_usdt'):
+    base_url = dom_url + '/data/v1/depth?market='+kp+'&size=50'
     resHttpText = mHTTP.spyHTTP3(p_url=base_url)
 
     if type(resHttpText) is int:
@@ -400,10 +401,9 @@ def api_depth(kp='btcusdt'):
         return -1
 
     rtn=json.loads(resHttpText)
-    if rtn['status']<>u'ok':
-        return -2
 
-    data=rtn['tick']
+
+    data=rtn
 
     #买盘
     bids_data=data['bids']
@@ -418,11 +418,14 @@ def api_depth(kp='btcusdt'):
         asum += asks_data[i][1]
     return (bsum,asum)
 
-wh() #外汇
+# wh() #外汇
 api_commtxpair()
+# print api_kline()
 # api_depth()
 
-#
+# api_dealhis()
+
+
 # print len(kp_coin)
 # for i in range(len(kp_coin)):
 #     print kp_coin[i]
@@ -440,8 +443,8 @@ if os.getenv('PYVV')=='work_hy':
                 api_commtxpair()
             if int(sys.argv[1])<=2:
                 logger.debug('标记为0的过滤USDT')
-                wh()
-                api_otcusdt()
+                # wh()
+                # api_otcusdt()
             runCollect()
             time.sleep(5)
         except Exception,e:
