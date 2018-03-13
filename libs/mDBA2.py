@@ -37,6 +37,40 @@ class A_SDB:
     def __init__(self):
         self.sql=''
 
+    # Radar Load KLineHis
+    def sLoadKLineHis(self,o):
+        self.sql='select * from wb_kline where  kutc > date_add(now(),interval -5 minute) ' \
+                 'and exn=\''+o['exn']+'\' ' \
+                 'order by kp,kutc '
+        return self.OpsSql()
+
+    # Radar Append PushMsg
+    def sPushMsg(self,o):
+        self.sql='insert into wb_pushmsg(msg_type,kp,exn,kutc,close,msg_value,msg_body,createAt) values (' \
+            '\''+o['msg_type']+'\',' \
+            '\''+o['kp']+'\', ' \
+            '\''+o['exn']+'\',' \
+            '\''+o['kutc']+'\', ' \
+            +str(o['close'])+',' \
+            '\''+o['msg_value']+'\',' \
+            '\''+o['msg_body']+'\',' \
+            'now())'
+        return self.OpsSql()
+
+    # Radar Append PushMsg
+    def sPushMsgAnm(self,o):
+        self.sql='insert into wb_gorush(msg_type,kp,exn,kutc,close,msg_value,msg_body,createAt) values (' \
+            '\''+o['msg_type']+'\',' \
+            '\''+o['kp']+'\', ' \
+            '\''+o['exn']+'\',' \
+            '\''+o['kutc']+'\', ' \
+            +str(o['close'])+',' \
+            '\''+o['msg_value']+'\',' \
+            '\''+o['msg_body']+'\',' \
+            'now())'
+        return self.OpsSql()
+
+
     # Load
     def sLoadKLine(self,o):
         self.sql='select * from wb_kline where kp=\''+o['kp']+'\'' \
