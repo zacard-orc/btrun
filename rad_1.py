@@ -150,13 +150,14 @@ def loadDataSet(exn='OKEx'):
             kpl.append(dbsets[i])
 
 
-loadDataSet('OKEx')
-loadDataSet('HB')
+# loadDataSet('OKEx')
+# loadDataSet('HB')
 
 
 if os.getenv('PYVV')=='work_hy':
     while True:
-        loadDataSet()
+        loadDataSet('OKEx')
+        loadDataSet('HB')
         time.sleep(60)
 
 

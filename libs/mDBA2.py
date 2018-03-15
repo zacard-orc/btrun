@@ -37,6 +37,15 @@ class A_SDB:
     def __init__(self):
         self.sql=''
 
+    # Data Fix
+    def sDataFixHisMaxMin(self):
+        #and exn=\'HB\'
+        self.sql='replace into wg_hislimit ' \
+            'select exn,kp,max(his_high) as d7_high,min(his_low) as d7_low from wb_kline where ' \
+            'kutc >= date_add(now(),interval -7 day)   ' \
+            'group by exn,kp '
+        return self.DMLSql()
+
     # Radar Load KLineHis
     def sLoadKLineHis(self,o):
         self.sql='select * from wb_kline where  kutc > date_add(now(),interval -5 minute) ' \
