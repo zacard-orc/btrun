@@ -433,7 +433,7 @@ api_commtxpair()
 
 
 logger.debug(os.getenv('PYVV'))
-if os.getenv('PYVV')=='work_hy':
+if os.getenv('PYVV')=='work':
     while True:
         try:
             nst = datetime.datetime.now().strftime("%M")

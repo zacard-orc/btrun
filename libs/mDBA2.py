@@ -42,7 +42,7 @@ class A_SDB:
         #and exn=\'HB\'
         self.sql='replace into wg_hislimit ' \
             'select exn,kp,max(his_high) as d7_high,min(his_low) as d7_low from wb_kline where ' \
-            'kutc >= date_add(now(),interval -7 day)   ' \
+            'kutc >= date_add(now(),interval -30 day)   ' \
             'group by exn,kp '
         return self.DMLSql()
 

@@ -10,7 +10,7 @@ import logging,os,sys,datetime,time
 import httplib,ssl,requests
 import json,subprocess
 import mUtil,mEnv
-from PIL import Image
+# from PIL import Image
 
 
 # logging.basicConfig(filename = os.path.join(os.getcwd()+'/logs/',sys.argv[1]+'.log'),
@@ -102,51 +102,6 @@ def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='g
     except ssl.SSLError,r:
         logging.error('SSL/'+r.message)
         return 500
-
-
-
-
-def spyHTTP3KuTrace302(p_url,file_type):
-    rtn_fname=''
-    if len(p_url)>0:
-        FateIp=mUtil.genFateIP()
-        logging.debug(u'模拟IP:'+FateIp+'/Now Spying/'+p_url)
-        myheaders = {
-            'User-Agent':mEnv.env_ua['h5'],
-            'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Encoding':'gzip',
-            'Accept-Language':'zh-CN',
-            'X-Forwarded-For':FateIp,
-            'X-Real-IP':FateIp,
-            'Refer':'http://aa.japanfans.com/',
-            'Cookie':mUtil.getMyCookie()
-        }
-        logging.debug(u'开始下载'+p_url.split('/')[2]+u'文件')
-        try:
-            r = requests.get(p_url,headers=myheaders,timeout=60)
-        except Exception,e:
-            logging.debug(str(e.message))
-            return rtn_fname
-        # logging.debug(r.url)
-        if r.status_code==200:
-            rtn_fname=dest_fileName=r.url.split('?')[0].split('/')[-1]
-            logging.debug(u'下载'+dest_fileName+u'成功,大小'+str(len(r.content))+u',开始写文件')
-            fdir=mEnv.env_filepath[os.getenv('PYVV')]+file_type+'/'
-            f=open(fdir+dest_fileName,'wb')
-            f.write(r.content)
-            logging.debug(u'写文件成功')
-            if file_type=='img':
-                try:
-                    fImage=Image.open(fdir+dest_fileName)
-                    rtn_fname=rtn_fname+'|'+str(fImage.size[0])+'x'+str(fImage.size[1])
-                except Exception,e:
-                    logging.error(e.message)
-                # fImage.destroy()
-                # print fImage.size
-            f.close()
-
-
-    return rtn_fname
 
 
 
