@@ -13,7 +13,7 @@ import mEnv
 from mUtil import  u8
 
 
-runEv='ana'
+runEv=os.getenv('PYVV')
 db_host=mEnv.env_dbinfo[runEv]['db_host']
 db_user=mEnv.env_dbinfo[runEv]['db_user']
 db_passwd=mEnv.env_dbinfo[runEv]['db_passwd']
@@ -36,13 +36,35 @@ class A_SDB:
     def __init__(self):
         self.sql=''
 
-    def sbtc_loadk5(self,o):
-        self.sql='select * from btc_market_k5 where ' \
-                 'ddtime >= \'' + o['sttime_flag'] +'\' order by ddtime'
-        logging.debug('读取K5 30*5分钟内记录')
+    # def sbtc_loadk5(self,o):
+    #     self.sql='select * from btc_market_k5 where ' \
+    #              'ddtime >= \'' + o['sttime_flag'] +'\' order by ddtime'
+    #     logging.debug('读取K5 30*5分钟内记录')
+    #     return self.OpsSql()
+
+    def sLoadKLineBasic(self,o):
+        self.sql='select aa.*,bb.* from ( ' \
+                 'select a.*,round((a.close-b.d7_low)*100/(b.d7_high-b.d7_low),2)  as pcts ' \
+                 'from wb_kline_rq a,wg_hislimit b where a.kp=\''+o['kp']+'\'  and ' \
+                 'a.kp=b.kp and b.exn=\'HB\' and a.kutc > date_add(now(),interval -'+str(o['pertime'])+' hour)) aa,' \
+                  '(' \
+                 'select concat(date_format(kutc,\'%H:\'),floor(date_format(kutc,\'%i\')/5)*5) AS c,' \
+                 'round(sum(buy_a)/sum(sell_a),2) as dk_r,' \
+                 'round(sum(buy_big_a)/sum(sell_big_a),2) as dk_big_r ' \
+                 'from wb_kline_acc where kp=\''+o['kp']+'\' ' \
+                'and kutc > date_add(now(),interval -'+str(o['pertime'])+' hour)' \
+                 ' and date_format(kutc,\'%i\') >9 ' \
+                'group by c ' \
+                'union ' \
+                'select concat(date_format(kutc,\'%H:0\'),floor(date_format(kutc,\'%i\')/5)*5) AS c,' \
+                 'round(sum(buy_a)/sum(sell_a),2) as dk_r,' \
+                 'round(sum(buy_big_a)/sum(sell_big_a),2) as  dk_big_r ' \
+                'from wb_kline_acc where kp=\''+o['kp']+'\' ' \
+                'and kutc > date_add(now(),interval -'+str(o['pertime'])+' hour) ' \
+                'and date_format(kutc,\'%i\') <=9 ' \
+                'group by c) bb ' \
+                'where date_format(aa.kutc,\'%H:%i\')=bb.c order by kutc desc '
         return self.OpsSql()
-
-
 
 
 

@@ -37,6 +37,30 @@ class A_SDB:
     def __init__(self):
         self.sql=''
 
+
+    # Data 米匡
+    def sDataRQInsertKLine(self,o):
+        self.sql = 'replace into wb_kline_rq ' \
+                   ' values (' \
+                    '\''+o['exn']+'\',' \
+                    '\''+o['kp']+'\',' \
+                    '\''+o['kutc']+'\','\
+                    +str(o['open'])+','\
+                    +str(o['close'])+','\
+                    +str(o['p_ma5']) + ','\
+                    + str(o['p_ma30']) + ',' \
+                    + str(o['p_ma60']) + ',' \
+                    + str(o['angle_v_ma5']) + ','\
+                     + str(o['angle_v_ma30']) + ',' \
+                     + str(o['angle_v_ma60']) + ',' \
+                        + str(o['high']) + ',' \
+                     + str(o['low']) + ',' \
+                    + str(o['vol']) + ',' \
+                     + str(o['amount']) + ',' \
+                     + str(o['count']) + ')'
+        logging.debug('米匡插入 '+str(o['kp'])+'行情')
+        self.DMLSql(logflag=True)
+
     # Data Fix
     def sDataFixHisMaxMin(self):
         #and exn=\'HB\'
