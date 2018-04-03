@@ -1,12 +1,8 @@
 # -*- coding:utf-8 -*-
 # Twitter测试
 
-
 # 导入tweepy
-import scipy
-# import lightgbm
 import tweepy,time,json
-from PIL import Image
 
 
 # 填写twitter提供的开发Key和secret

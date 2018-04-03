@@ -65,8 +65,15 @@ for i in range(len(rtn)):
             if card_rtn[z].has_key('mblog'):
                 mblog=card_rtn[z]['mblog']
                 o={}
+                o['mtype']='wb'
+                o['name']=u8(rtn[i]['name'])
                 o['mp_sn']=u8(mblog['mid'])
                 o['mp_url']='https://m.weibo.cn/status/'+u8(mblog['mid'])
+
+                o['ava']=u8(mblog['user']['avatar_hd'])
+                o['screen_name']=u8(mblog['user']['screen_name'])
+
+                insdb.sMediaUpdateUserInfo(o)
 
                 tmp_crat=u8(mblog['created_at'])
                 o['create_at'] = '2018-'+u8(mblog['created_at'])+' 00:00:00'

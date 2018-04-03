@@ -37,9 +37,15 @@ class A_SDB:
         self.sql=''
 
     def sMediaWeiboList(self,o):
-        self.sql='select * from bk_dsms_obj where type=\''+o['mtype']+'\' and flag=1;'
+        self.sql='select * from bk_dsms_obj where mtype=\''+o['mtype']+'\' and flag=1;'
         logging.debug('读取'+o['mtype']+'的记录')
         return self.OpsSql()
+
+    def sMediaUpdateUserInfo(self,o):
+        self.sql='update bk_dsms_obj ' \
+                 'set screen_name=\''+o['screen_name']+'\',ava=\''+o['ava']+'\' where ' \
+                 'mtype=\''+o['mtype']+'\' and name=\''+o['name']+'\';'
+        self.DMLSql()
 
     def sInsertCataArt(self,o):
         self.sql='insert into bk_cata_art values (' \
