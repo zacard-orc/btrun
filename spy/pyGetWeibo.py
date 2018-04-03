@@ -4,6 +4,9 @@
 '''
 
 from __future__ import division
+import sys
+sys.path.append('../')
+
 import os,urllib,time,traceback,json,re,datetime,requests,hashlib,random,time
 from libs import mBusiLog,mUtil,mHTTP,mDBA3
 from libs.mUtil import u8
