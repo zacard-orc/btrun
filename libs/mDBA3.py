@@ -36,11 +36,24 @@ class A_SDB:
     def __init__(self):
         self.sql=''
 
-    # def sbtc_loadk5(self,o):
-    #     self.sql='select * from btc_market_k5 where ' \
-    #              'ddtime >= \'' + o['sttime_flag'] +'\' order by ddtime'
-    #     logging.debug('读取K5 30*5分钟内记录')
-    #     return self.OpsSql()
+    def sMediaWeiboList(self,o):
+        self.sql='select * from bk_dsms_obj where type=\''+o['mtype']+'\' and flag=1;'
+        logging.debug('读取'+o['mtype']+'的记录')
+        return self.OpsSql()
+
+    def sInsertCataArt(self,o):
+        self.sql='insert into bk_cata_art values (' \
+                '\''+o['author']+'\',' \
+                '\''+o['mtype']+'\',' \
+                '\''+o['mp_sn']+'\',' \
+                '\''+o['art_title']+'\',' \
+                '\''+o['art_text']+'\',' \
+                '\''+o['create_at']+'\',' \
+                '\''+o['mp_url']+'\',' \
+                '\''+o['city_ref']+'\',' \
+                '\''+o['out_type']+'\',' \
+                '\''+o['out_media']+'\')'
+        self.DMLSql()
 
     def sLoadKLineBasic(self,o):
         self.sql='select aa.*,bb.* from ( ' \
@@ -63,7 +76,7 @@ class A_SDB:
                 'and kutc > date_add(now(),interval -'+str(o['pertime'])+' hour) ' \
                 'and date_format(kutc,\'%i\') <=9 ' \
                 'group by c) bb ' \
-                'where date_format(aa.kutc,\'%H:%i\')=bb.c order by kutc desc '
+                'where date_format(aa.kutc,\'%H:%i\')=bb.c order by kutc  '
         return self.OpsSql()
 
 
