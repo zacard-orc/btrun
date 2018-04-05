@@ -81,7 +81,7 @@ for i in range(len(rtn)):
             o['art_title']=''
             o['art_text']=u8(tweet.full_text)
             o['mp_url']='https://mobile.twitter.com/cnnbrk/status/'+str(o['mp_sn'])
-            o['create_at']=tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            o['create_at']=tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')  #GMT时间
             o['city_ref']=''
             o['out_type']=''
             o['out_media']=''
@@ -129,8 +129,6 @@ for i in range(len(rtn)):
 
             # print json.dumps(o,indent=2)
             insdb.sInsertCataArt(o)
-
-            time.sleep(2)
         logger.debug('等下一条Twitter主')
     except Exception, e:
         logger.debug('[OHS]' + traceback.format_exc())

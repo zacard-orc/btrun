@@ -81,7 +81,7 @@ for i in range(len(rtn)):
                     insdb.sMediaUpdateUserInfo(o)
 
                 tmp_crat=u8(mblog['created_at'])
-                o['create_at'] = '2018-'+u8(mblog['created_at'])+' 00:00:00'
+                o['create_at'] = '2018-'+u8(mblog['created_at'])+' 00:00:00'   #EST时间
                 if tmp_crat.find('分钟前')>=0:
                     tnum=tmp_crat.replace('分钟前','')
                     this_day = datetime.datetime.now() + datetime.timedelta(minutes=-int(tnum))
