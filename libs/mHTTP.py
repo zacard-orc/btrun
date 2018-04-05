@@ -26,6 +26,7 @@ sess = requests.session()
 sess.keep_alive = True
 
 
+
 def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='get',p_data=None,p_header=None):
     FateIp=mUtil.genFateIP()
     print p_url
@@ -109,7 +110,7 @@ def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='g
 
 
 
-def spyHTTP6CDNPIC(p_url,xrefer,xqs=None):
+def spyHTTP6CDNPIC(p_url,xrefer=None,xqs=None):
     FateIp=mUtil.genFateIP()
     logging.debug('Moni:'+FateIp+'/Now Spying/'+p_url)
     '''

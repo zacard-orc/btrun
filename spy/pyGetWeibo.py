@@ -76,7 +76,9 @@ for i in range(len(rtn)):
                 o['ava']=u8(mblog['user']['avatar_hd'])
                 o['screen_name']=u8(mblog['user']['screen_name'])
 
-                insdb.sMediaUpdateUserInfo(o)
+                if z<=2:
+                    #少调用数据库
+                    insdb.sMediaUpdateUserInfo(o)
 
                 tmp_crat=u8(mblog['created_at'])
                 o['create_at'] = '2018-'+u8(mblog['created_at'])+' 00:00:00'

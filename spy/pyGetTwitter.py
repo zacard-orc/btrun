@@ -1,10 +1,12 @@
 # -*- coding:utf-8 -*-
 '''
-币王-微博监控
+币王-Twttier监控
 '''
 
 from __future__ import division
-import os,urllib,time,traceback,json,re,datetime,requests,hashlib,random,tweepy
+import sys
+sys.path.append('../')
+import os,urllib,time,traceback,json,re,datetime,requests,hashlib,random,tweepy,upyun
 from libs import mBusiLog,mUtil,mHTTP,mDBA3
 from libs.mUtil import u8
 
@@ -43,17 +45,78 @@ api = tweepy.API(auth)
 # logger.debug(os.getcwd()+'/userdict.txt')
 
 
+def downFromSource(url,write_to_fname,write_to_dir):
+    img_obj = mHTTP.spyHTTP6CDNPIC(url)
+
+    with open(os.getcwd() + '/'+write_to_dir+'/' + write_to_fname, 'wb') as f:
+        f.write(img_obj['content'])
+        logger.debug('Image Write Done')
+
 for i in range(len(rtn)):
     try:
-        public_tweets = api.user_timeline(u8(rtn[i]['name']))
-        for tweet in public_tweets:
-            print tweet.created_at
-            if hasattr(tweet, 'extended_entities'):
-                print json.dumps(tweet.extended_entities, indent=2)
+        public_tweets = api.user_timeline(u8(rtn[i]['name']),tweet_mode='extended',count=10)
 
+
+        for tweet in public_tweets:
+            # print tweet
+            # time.sleep(1111)
+            o={}
+            #推文
+            o['name']=u8(rtn[i]['name'])
+            o['mtype']='tw'
+            o['author']=u8(rtn[i]['name'])
+            o['mp_sn']=str(tweet.id)
+            o['art_title']=''
+            o['art_text']=u8(tweet.full_text)
+            o['mp_url']='https://mobile.twitter.com/cnnbrk/status/'+str(o['mp_sn'])
+            o['create_at']=tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            o['city_ref']=''
+            o['out_type']=''
+            o['out_media']=''
+
+
+            #Profile侧
+            if i<=2:
+                o['b']='a'
+                o['ava'] = u8(tweet.user.profile_image_url_https).replace('normal','bigger')
+                o['screen_name'] = u8(tweet.user.screen_name)
+                fname_img_ava=o['ava'].split('/')[-1]
+                #下载头像图片
+                downFromSource(o['ava'],fname_img_ava,'ava')
+                o['ava'] = fname_img_ava
+
+                insdb.sMediaUpdateUserInfo(o)
+
+            # print tweet
+            logger.debug(tweet.full_text)
+            if hasattr(tweet, 'extended_entities'):
+                # print json.dumps(tweet.extended_entities, indent=2)
+                media_sets=tweet.extended_entities['media']
+                for j in range(len(media_sets)):
+                    #break 代表只取第一张
+                    if media_sets[j]['type']==u'photo':
+                        o['out_type']='img'
+                        o['out_media']=u8(media_sets[j]['media_url'])
+                        fname_img_sucai=o['out_media'].split('/')[-1]
+                        downFromSource(o['out_media'], fname_img_sucai, 'sucai')
+                        o['out_media']=fname_img_sucai
+                        break
+                    if media_sets[j]['type']==u'video':
+                        o['out_type'] = 'video'
+                        video_info=u8(media_sets[j]['video_info']['variants'][0]['url'])
+                        o['out_media']=video_info
+                        fname_video_sucai = o['out_media'].split('/')[-1]
+                        downFromSource(o['out_media'], fname_video_sucai, 'sucai')
+                        o['out_media']=fname_video_sucai
+                        break
+
+            # print json.dumps(o,indent=2)
+            insdb.sInsertCataArt(o)
+
+            time.sleep(2)
         logger.debug('等下一条Twitter主')
     except Exception, e:
         logger.debug('[OHS]' + traceback.format_exc())
-    time.sleep(9)
+        time.sleep(1)
 
 logger.debug('结束')

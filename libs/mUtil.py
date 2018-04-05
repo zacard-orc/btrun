@@ -17,6 +17,9 @@ def getMyCookie():
     basecookie='_T_WM='+xseed+'; M_WEIBOCN_PARAMS=featurecode%3D20000181%26fid%3D100505'+'%26uicode%3D10000011'
     return basecookie
 
+def printDicEle(o):
+    for key in o:
+        print key,type(o[key])
 
 def genFateIP():
     unitlist=range(1,253)

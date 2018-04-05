@@ -10,7 +10,7 @@ import time
 import logging,os,sys,json,time,datetime
 from DBUtils.PooledDB import PooledDB
 import mEnv
-from mUtil import  u8
+from mUtil import  u8,printDicEle
 
 
 runEv=os.getenv('PYVV')
@@ -37,7 +37,7 @@ class A_SDB:
         self.sql=''
 
     def sMediaWeiboList(self,o):
-        self.sql='select * from bk_dsms_obj where mtype=\''+o['mtype']+'\' and flag=1;'
+        self.sql='select * from bk_dsms_obj where mtype=\''+o['mtype']+'\' and flag=2;'
         logging.debug('读取'+o['mtype']+'的记录')
         return self.OpsSql()
 
@@ -48,12 +48,13 @@ class A_SDB:
         self.DMLSql()
 
     def sInsertCataArt(self,o):
+        # printDicEle(o)
         self.sql='insert into bk_cata_art values (' \
                 '\''+o['author']+'\',' \
                 '\''+o['mtype']+'\',' \
                 '\''+o['mp_sn']+'\',' \
                 '\''+o['art_title']+'\',' \
-                '\''+o['art_text']+'\',' \
+                '\''+MySQLdb.escape_string(o['art_text'])+'\',' \
                 '\''+o['create_at']+'\',' \
                 '\''+o['mp_url']+'\',' \
                 '\''+o['city_ref']+'\',' \
