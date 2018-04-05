@@ -62,6 +62,10 @@ class A_SDB:
                 '\''+o['out_media']+'\')'
         self.DMLSql()
 
+    def sQueryCataArt(self,o):
+        self.sql='select * from bk_cata_art where mp_sn=\''+o['mp_sn']+'\';'
+        return self.OpsSql()
+
     def sLoadKLineBasic(self,o):
         self.sql='select aa.*,bb.* from ( ' \
                  'select a.*,round((a.close-b.d7_low)*100/(b.d7_high-b.d7_low),2)  as pcts ' \

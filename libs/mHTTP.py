@@ -26,6 +26,13 @@ sess = requests.session()
 sess.keep_alive = True
 
 
+def uyUpload(p_bucket,p_fname,p_data):
+    p_url='http://v0.api.upyun.com/'+p_bucket+'/'+p_fname
+    myheaders={
+
+    }
+    r = sess.put(p_url, headers=myheaders, timeout=60, verify=False,data=p_data)
+
 
 def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='get',p_data=None,p_header=None):
     FateIp=mUtil.genFateIP()

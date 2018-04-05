@@ -6,7 +6,7 @@
 from __future__ import division
 import sys
 sys.path.append('../')
-import os,urllib,time,traceback,json,re,datetime,requests,hashlib,random,tweepy,upyun
+import os,urllib,time,traceback,json,re,datetime,requests,hashlib,random,tweepy
 from libs import mBusiLog,mUtil,mHTTP,mDBA3
 from libs.mUtil import u8
 
@@ -44,19 +44,31 @@ api = tweepy.API(auth)
 # jieba.load_userdict(os.getcwd()+'/userdict.txt')
 # logger.debug(os.getcwd()+'/userdict.txt')
 
+import upyun
+from upyun import FileStore
+from upyun import print_reporter
+
+
+bucket_name='shortimgae'
+up = upyun.UpYun(bucket_name, 'adminrw', '4444dddd@', timeout=60, endpoint=upyun.ED_AUTO)
+
+
+def uploadFromLocal(fname,fobj):
+    up.put(fname,fobj,need_resume=True,store=FileStore(),reporter=print_reporter)
 
 def downFromSource(url,write_to_fname,write_to_dir):
     img_obj = mHTTP.spyHTTP6CDNPIC(url)
-
     with open(os.getcwd() + '/'+write_to_dir+'/' + write_to_fname, 'wb') as f:
         f.write(img_obj['content'])
         logger.debug('Image Write Done')
+        #继续上传Upyun
+        uploadFromLocal(write_to_fname,img_obj['content'])
+        logger.debug('Image Upload Done')
+
 
 for i in range(len(rtn)):
     try:
         public_tweets = api.user_timeline(u8(rtn[i]['name']),tweet_mode='extended',count=10)
-
-
         for tweet in public_tweets:
             # print tweet
             # time.sleep(1111)
@@ -74,9 +86,14 @@ for i in range(len(rtn)):
             o['out_type']=''
             o['out_media']=''
 
+            ext_rcd=insdb.sQueryCataArt(o)
+            if len(ext_rcd)==1:
+                logger.debug('记录已存在，skip')
+                continue
 
-            #Profile侧
-            if i<=2:
+
+            #Profile
+            if i<=1:
                 o['b']='a'
                 o['ava'] = u8(tweet.user.profile_image_url_https).replace('normal','bigger')
                 o['screen_name'] = u8(tweet.user.screen_name)
@@ -87,7 +104,7 @@ for i in range(len(rtn)):
 
                 insdb.sMediaUpdateUserInfo(o)
 
-            # print tweet
+            # 多媒体图像
             logger.debug(tweet.full_text)
             if hasattr(tweet, 'extended_entities'):
                 # print json.dumps(tweet.extended_entities, indent=2)
