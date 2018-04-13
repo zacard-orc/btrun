@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-# 火币 米匡-K线，走SVM
+# 火币 米匡-K线，走TensorFlow
 
 from __future__ import division
 
@@ -10,6 +10,8 @@ sys.path.append('../')
 import os,time,traceback
 import numpy as np
 from libs import mHTTP, mBusiLog, mUtil, mEnv,mDBA3
+from tf_data_class import TfDataSet
+import tf_train
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.multiclass import OneVsRestClassifier
@@ -17,11 +19,8 @@ from sklearn.svm import LinearSVC
 from sklearn import metrics
 from sklearn import svm
 
-# print 'aa'
-# time.sleep(111)
-import seaborn as sns
-import matplotlib.pyplot as plt
 
+import tensorflow as tf
 
 insdb = mDBA3.A_SDB()
 logger = mBusiLog.myLog(os.path.basename(__file__).split('.')[0] + '.log')
@@ -146,7 +145,9 @@ try:
         pdl_vol=[]
         pdl_close=[]
 
-        pdl_class=[]   #分类,0=默认，1=顶，2=底
+        pdl_class0=[]   #分类,0=默认，1=顶，2=底
+        pdl_class1=[]   #分类,0=默认，1=顶，2=底
+        pdl_class2=[]   #分类,0=默认，1=顶，2=底
 
 
         for j in range(len(rtn)):
@@ -181,7 +182,11 @@ try:
 
             #ma30差值
             pdl_ma30_delta.append(round((rtn[j]['close']-rtn[j]['p_ma30'])/rtn[j]['p_ma30'],2))
-            pdl_class.append(0)
+            pdl_class0.append(0)
+            pdl_class1.append(0)
+            pdl_class2.append(0)
+
+            # pdl_class.append([0,0,0])
 
             #ma5/30/60位置比较
             if rtn[j]['p_ma5']>rtn[j]['p_ma30']:
@@ -222,10 +227,13 @@ try:
                     break
 
             if flag_high==True:
-                pdl_class[-1]=1
+                pdl_class1[-1]=1
+                # pdl_class[-1][1]=1
                 # logger.debug(rtn[j]['kutc'].strftime("%Y-%m-%d %H:%M") + ' 顶点')
             if flag_low==True:
-                pdl_class[-1]=2
+                pdl_class2[-1]=1
+                # pdl_class[-1][2]=1
+
                 # logger.debug(rtn[j]['kutc'].strftime("%Y-%m-%d %H:%M") + ' 低点')
 
         logger.debug('清洗完成，开始构建Pandas')
@@ -262,7 +270,9 @@ try:
             'dk':pdl_dk,
             # 'dk_big':pdl_dk_big,
             'macd':pdl_macd,
-            'class':pdl_class
+            'class0':pdl_class0,
+            'class1':pdl_class1,
+            'class2':pdl_class2
         },index=pdl_idx)
 
         logger.debug('生成' + str(df.shape) + '矩阵PD')
@@ -270,26 +280,42 @@ try:
         logger.debug(str(df.describe()))
         # logger.debug(str(df.info))
 
-        all_label = df['class'].values
-        df_train = df.drop(['class'], axis=1)
+        all_label = df[['class0','class1','class2']].values
+        df_train = df.drop(['class0','class1','class2'], axis=1)
         all_train = df_train.values
 
-        X_train, X_test, y_train, y_test = train_test_split(all_train, all_label, test_size=0.2, random_state=1)
+
+        '''
+        all_train 
+        all_label
+        3605*8 3605*1
+        04-12,09:52:02.290646 btc_q2.py 268 MainThread 48435 <<module>> 生成(3605, 9)矩阵PD
+        04-12,09:52:02.291979 btc_q2.py 269 MainThread 48435 <<module>> 
+        ag30          float64
+        ag5           float64
+        class           int64
+        cross_530       int64
+        dk            float64
+        lead_down     float64
+        lead_up       float64
+        ma30_delta    float64
+        macd          float64
+        dtype: object
+        '''
+        train_x, test_x, train_y, test_y = train_test_split(all_train, all_label, test_size=0.2, random_state=1)
+        ins_o_train=TfDataSet(train_x,train_y)
+        logger.debug('训练集总数:'+str(ins_o_train.num_examples))
+        tf_train.train(ins_o_train)
+        # o_train={}
+        # o_train['x']=train_x
+        # o_train['y']=train_y
+        #
+        #
+        # o_test={}
+        # o_test['x']=test_x
+        # o_test['y']=test_y
 
 
-        y_pred=OneVsRestClassifier(LinearSVC(random_state=0)).fit(X_train, y_train).predict(X_test)
-        logger.debug('train nums='+str(len(X_train)))
-        logger.debug(str(y_test))
-        logger.debug(str(y_pred))
-
-        #计算分类精确指数
-        met_total=len(y_test)
-        met_true=0
-        for z in range(met_total):
-            if y_test[z]==y_pred[z]:
-                met_true+=1
-
-        logger.debug('AUC:'+str(round(met_true*100/met_total,4)))
 
 
 

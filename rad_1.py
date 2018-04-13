@@ -12,6 +12,8 @@ from bs4 import  BeautifulSoup
 insdb = mDBA2.A_SDB()
 logger = mBusiLog.myLog(os.path.basename(__file__).split('.')[0] + '.log')
 
+#设置幅度
+ns=1.2
 
 def loadDataSet(exn='OKEx'):
     o={}
@@ -32,7 +34,7 @@ def loadDataSet(exn='OKEx'):
             n_delat_pct=round(abs(n_delta)*100/kpl[0]['close'],2)
             logger.debug(mUtil.u8(kpl[0]['kp'])+','+str(n_delat_pct)+'%')
             #头尾涨幅
-            if n_delat_pct>1.2:
+            if n_delat_pct>ns:
                 #TODO 记录异动，msg_type,kp,exn,kutc,close,msg_value,msg_body
                 o['msg_type']='异动'
                 o['kp']=mUtil.u8(kpl[0]['kp'])
@@ -66,7 +68,8 @@ def loadDataSet(exn='OKEx'):
                               +',在'+o['exn']+'上行情'+o['msg_type']+'，价格为'+str(o['close'])\
                               +'，最近5分钟内'+pct_desc+'幅达到'\
                               +str(n_delat_pct)+'%，请留意观察'
-                insdb.sPushMsgAnm(o)
+                if n_delat_pct>ns:
+                    insdb.sPushMsgAnm(o)
 
             if kpl[-1]['angle_v_ma5']<kpl[-1]['angle_v_ma30']*1.5 \
                 and kpl[-1]['angle_v_ma30']<kpl[-1]['angle_v_ma60']*1.3 \
@@ -84,7 +87,8 @@ def loadDataSet(exn='OKEx'):
                               +',在'+o['exn']+'上行情'+o['msg_type']+'，价格为'+str(o['close'])\
                               +'，最近5分钟内'+pct_desc+'幅达到-'\
                               +str(n_delat_pct)+'%，请留意观察'
-                insdb.sPushMsgAnm(o)
+                if n_delat_pct>ns:
+                    insdb.sPushMsgAnm(o)
 
             #急转弯
             if abs(kpl[-1]['angle_v_ma5'])>75:
@@ -101,7 +105,8 @@ def loadDataSet(exn='OKEx'):
                               +',在'+o['exn']+'上行情'+o['msg_type']+'，价格为'+str(o['close'])\
                               +'，最近5分钟内'+pct_desc+'幅达到'\
                               +str(n_delat_pct)+'%，请留意观察'
-                insdb.sPushMsgAnm(o)
+                if n_delat_pct>ns:
+                    insdb.sPushMsgAnm(o)
 
             #
             # #单调记录
@@ -189,8 +194,8 @@ if os.getenv('PYVV')=='work_hy':
         except Exception,e:
             logger.error(e.message)
             logger.debug('[OHS]' + traceback.format_exc())
-            time.sleep(60)
-        time.sleep(60)
+            time.sleep(45)
+        time.sleep(45)
 
 
 

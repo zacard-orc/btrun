@@ -356,8 +356,8 @@ def runCollect():
 
 
 def api_otcusdt():
-    sell_base_url='https://api-otc.huobipro.com/v1/otc/trade/list/public?coinId=2&tradeType=1&currentPage=1&payWay=&country=&merchant=0&online=1&range=0'
-    bul_base_url='https://api-otc.huobipro.com/v1/otc/trade/list/public?coinId=2&tradeType=0&currentPage=1&payWay=&country=&merchant=0&online=1&range=0'
+    sell_base_url='https://otc-api.huobi.br.com/v1/otc/trade/list/public?country=37&currency=1&payMethod=0&currPage=1&coinId=2&tradeType=0&merchant=1&online=1'
+    bul_base_url ='https://otc-api.huobi.br.com/v1/otc/trade/list/public?country=37&currency=1&payMethod=0&currPage=1&coinId=2&tradeType=1&merchant=1&online=1'
 
     pageRtn=mHTTP.spyHTTP3(sell_base_url)
     rtn=json.loads(pageRtn)
