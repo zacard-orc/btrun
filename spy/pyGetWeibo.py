@@ -76,7 +76,7 @@ for i in range(len(rtn)):
                 o['ava']=u8(mblog['user']['avatar_hd'])
                 o['screen_name']=u8(mblog['user']['screen_name'])
 
-                if z<=2:
+                if z<=1:
                     #少调用数据库
                     insdb.sMediaUpdateUserInfo(o)
 

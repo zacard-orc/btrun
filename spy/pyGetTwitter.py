@@ -69,6 +69,7 @@ def downFromSource(url,write_to_fname,write_to_dir):
 for i in range(len(rtn)):
     try:
         public_tweets = api.user_timeline(u8(rtn[i]['name']),tweet_mode='extended',count=10)
+        img_cc=0
         for tweet in public_tweets:
             # print tweet
             # time.sleep(1111)
@@ -86,23 +87,27 @@ for i in range(len(rtn)):
             o['out_type']=''
             o['out_media']=''
 
+            # Profile
+            if img_cc <= 1:
+                o['b'] = 'a'
+                o['ava'] = u8(tweet.user.profile_image_url_https).replace('normal', 'bigger')
+                o['screen_name'] = u8(tweet.user.screen_name)
+                fname_img_ava = o['ava'].split('/')[-1]
+                # 下载头像图片
+                downFromSource(o['ava'], fname_img_ava, 'ava')
+                o['ava'] = fname_img_ava
+
+                insdb.sMediaUpdateUserInfo(o)
+
+            img_cc += 1
+
             ext_rcd=insdb.sQueryCataArt(o)
             if len(ext_rcd)==1:
                 logger.debug('记录已存在，skip')
                 continue
 
 
-            #Profile
-            if i<=2:
-                o['b']='a'
-                o['ava'] = u8(tweet.user.profile_image_url_https).replace('normal','bigger')
-                o['screen_name'] = u8(tweet.user.screen_name)
-                fname_img_ava=o['ava'].split('/')[-1]
-                #下载头像图片
-                downFromSource(o['ava'],fname_img_ava,'ava')
-                o['ava'] = fname_img_ava
 
-                insdb.sMediaUpdateUserInfo(o)
 
             # 多媒体图像
             logger.debug(tweet.full_text)
@@ -129,19 +134,20 @@ for i in range(len(rtn)):
 
             insdb.sInsertCataArt(o)
             #TODO 收罗所有图片
-            logger.debug('收罗所有图片')
             if hasattr(tweet, 'extended_entities'):
                 # print json.dumps(tweet.extended_entities, indent=2)
                 media_sets=tweet.extended_entities['media']
+                logger.debug('收罗所有图片')
+
                 for j in range(len(media_sets)):
                     if media_sets[j]['type']==u'photo':
                         so={}
-                        o['mp_sn']=o['mp_sn']
+                        so['mp_sn']=o['mp_sn']
                         o['out_media']=u8(media_sets[j]['media_url'])
                         fname_img_sucai=o['out_media'].split('/')[-1]
                         downFromSource(o['out_media'], fname_img_sucai, 'sucai')
-                        o['sc_url']=fname_img_sucai
-                        o['sc_type']='img'
+                        so['sc_url']=fname_img_sucai
+                        so['sc_type']='img'
                         scrtn = insdb.sExistCataArtSucai(so)
                         if scrtn[0]['cc'] == 0:
                             insdb.sInsertCataArtSucai(so)
