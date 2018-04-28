@@ -93,7 +93,7 @@ for i in range(len(rtn)):
 
 
             #Profile
-            if i<=1:
+            if i<=2:
                 o['b']='a'
                 o['ava'] = u8(tweet.user.profile_image_url_https).replace('normal','bigger')
                 o['screen_name'] = u8(tweet.user.screen_name)
@@ -127,8 +127,26 @@ for i in range(len(rtn)):
                         o['out_media']=fname_video_sucai
                         break
 
-            # print json.dumps(o,indent=2)
             insdb.sInsertCataArt(o)
+            #TODO 收罗所有图片
+            logger.debug('收罗所有图片')
+            if hasattr(tweet, 'extended_entities'):
+                # print json.dumps(tweet.extended_entities, indent=2)
+                media_sets=tweet.extended_entities['media']
+                for j in range(len(media_sets)):
+                    if media_sets[j]['type']==u'photo':
+                        so={}
+                        o['mp_sn']=o['mp_sn']
+                        o['out_media']=u8(media_sets[j]['media_url'])
+                        fname_img_sucai=o['out_media'].split('/')[-1]
+                        downFromSource(o['out_media'], fname_img_sucai, 'sucai')
+                        o['sc_url']=fname_img_sucai
+                        o['sc_type']='img'
+                        scrtn = insdb.sExistCataArtSucai(so)
+                        if scrtn[0]['cc'] == 0:
+                            insdb.sInsertCataArtSucai(so)
+
+
         logger.debug('等下一条Twitter主')
     except Exception, e:
         logger.debug('[OHS]' + traceback.format_exc())
