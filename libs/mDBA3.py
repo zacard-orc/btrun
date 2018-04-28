@@ -47,6 +47,14 @@ class A_SDB:
                  'mtype=\''+o['mtype']+'\' and name=\''+o['name']+'\';'
         self.DMLSql()
 
+
+    def sExistCataArt(self,o):
+        # printDicEle(o)
+        self.sql='select count(*) as cc from  bk_cata_art where mtype=' \
+                '\''+o['mtype']+'\' and mp_sn=' \
+                '\''+o['mp_sn']+'\''
+        return self.OpsSql()
+
     def sInsertCataArt(self,o):
         # printDicEle(o)
         self.sql='insert into bk_cata_art values (' \
@@ -60,6 +68,19 @@ class A_SDB:
                 '\''+o['city_ref']+'\',' \
                 '\''+o['out_type']+'\',' \
                 '\''+o['out_media']+'\')'
+        self.DMLSql()
+
+    def sExistCataArtSucai(self,o):
+        self.sql='select count(*)  as cc from bk_cata_artsucai where mp_sn=' \
+                '\''+o['mp_sn']+'\' and sc_url=' \
+                '\''+o['sc_url']+'\''
+        return self.OpsSql()
+
+    def sInsertCataArtSucai(self,o):
+        self.sql='insert into bk_cata_artsucai(mp_sn,sc_url,sc_type) values (' \
+                '\''+o['mp_sn']+'\',' \
+                '\''+o['sc_url']+'\',' \
+                '\''+o['sc_type']+'\')'
         self.DMLSql()
 
     def sQueryCataArt(self,o):

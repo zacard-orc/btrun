@@ -104,9 +104,19 @@ for i in range(len(rtn)):
 
                 o['out_media']=''
                 o['out_type']=''
+
                 if mblog.has_key('pics'):
                     o['out_type']='img'
                     o['out_media']=u8(mblog['pics'][0]['large']['url'])
+                    # TODO 取出所有的素材
+                    for m in range(len(mblog['pics'])):
+                        so={}
+                        so['mp_sn']=o['mp_sn']
+                        so['sc_url']=u8(mblog['pics'][m]['large']['url'])
+                        so['sc_type']='img'
+                        scrtn=insdb.sExistCataArtSucai(so)
+                        if scrtn[0]['cc']==0:
+                            insdb.sInsertCataArtSucai(so)
 
                 if mblog.has_key('page_info'):
                     if u8(mblog['page_info']['type'])=='video':
@@ -116,7 +126,8 @@ for i in range(len(rtn)):
                                        ','+u8(mblog['page_info']['media_info']['stream_url'])
                     if u8(mblog['page_info']['type'])=='article':
                         o['out_type']='article'
-                        o['out_media']=u8(mblog['page_info']['page_url'])
+                        o['out_media']=u8(mblog['page_info']['page_pic']['url'])+\
+                                       ','+u8(mblog['page_info']['page_url'])
 
 
 
@@ -142,7 +153,9 @@ for i in range(len(rtn)):
 
                 o['city_ref']=u8(','.join(list(ref_word)))
                 o['mtype']='wb'
-                insdb.sInsertCataArt(o)
+                catartn=insdb.sExistCataArt(o)
+                if catartn[0]['cc']==0:
+                    insdb.sInsertCataArt(o)
 
 
         logger.debug('等下一条微博主')

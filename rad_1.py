@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+# 2018.2.13
 # 异动监控
 
 
@@ -40,14 +41,21 @@ def loadDataSet(exn='OKEx'):
                 o['kp']=mUtil.u8(kpl[0]['kp'])
                 o['kutc']=kpl[-1]['kutc'].strftime("%Y-%m-%d %H:%M:%S")
                 o['close']=kpl[-1]['close']
-                pct_desc='涨'
-                if n_delta<0:
-                    pct_desc='跌'
                 o['msg_value']=str(n_delat_pct)
+                pct_desc='涨'
                 o['msg_body']=o['kp']\
                               +',在'+o['exn']+'上行情'+o['msg_type']+'，价格为'+str(o['close'])\
                               +'，最近5分钟内'+pct_desc+'幅，达到'\
                               +str(n_delat_pct)+'%，请留意观察'
+                if n_delta<0:
+                    pct_desc='跌'
+                    o['msg_value'] = str(-n_delat_pct)
+                    o['msg_body']=o['kp']\
+                                  +',在'+o['exn']+'上行情'+o['msg_type']+'，价格为'+str(o['close'])\
+                                  +'，最近5分钟内'+pct_desc+'幅，达到'\
+                                  +str(-n_delat_pct)+'%，请留意观察'
+
+
                 insdb.sPushMsg(o)
                 insdb.sPushMsgAnm(o)
 
@@ -194,8 +202,8 @@ if os.getenv('PYVV')=='work_hy':
         except Exception,e:
             logger.error(e.message)
             logger.debug('[OHS]' + traceback.format_exc())
-            time.sleep(45)
-        time.sleep(45)
+            time.sleep(60)
+        time.sleep(60)
 
 
 
