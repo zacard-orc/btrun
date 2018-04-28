@@ -82,7 +82,8 @@ for i in range(len(rtn)):
             o['art_title']=''
             o['art_text']=u8(tweet.full_text)
             o['mp_url']='https://mobile.twitter.com/cnnbrk/status/'+str(o['mp_sn'])
-            o['create_at']=tweet.created_at.strftime('%Y-%m-%d %H:%M:%S')  #GMT时间
+            o['create_at']=tweet.created_at+datetime.timedelta(hours=+8) #GMT时间
+            o['create_at']=o['create_at'].strftime('%Y-%m-%d %H:%M:%S')  #BST+8时间
             o['city_ref']=''
             o['out_type']=''
             o['out_media']=''

@@ -67,7 +67,7 @@ class A_SDB:
                 '\''+o['mp_url']+'\',' \
                 '\''+o['city_ref']+'\',' \
                 '\''+o['out_type']+'\',' \
-                '\''+o['out_media']+'\')'
+                '\''+o['out_media']+'\',now())'
         self.DMLSql()
 
     def sExistCataArtSucai(self,o):
