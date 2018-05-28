@@ -57,7 +57,8 @@ class A_SDB:
 
     def sInsertCataArt(self,o):
         # printDicEle(o)
-        self.sql='insert into bk_cata_art values (' \
+        self.sql='insert into bk_cata_art(author,mtype,mp_sn,art_title,art_text,create_at' \
+                 ',mp_url,city_ref,out_type,out_media,update_at) values (' \
                 '\''+o['author']+'\',' \
                 '\''+o['mtype']+'\',' \
                 '\''+o['mp_sn']+'\',' \
@@ -77,7 +78,8 @@ class A_SDB:
         return self.OpsSql()
 
     def sInsertCataArtSucai(self,o):
-        self.sql='insert into bk_cata_artsucai(mp_sn,sc_url,sc_type) values (' \
+        self.sql='insert into bk_cata_artsucai(id,mp_sn,sc_url,sc_type) values (' \
+                '\''+o['id']+'\',' \
                 '\''+o['mp_sn']+'\',' \
                 '\''+o['sc_url']+'\',' \
                 '\''+o['sc_type']+'\')'

@@ -119,7 +119,8 @@ class A_SDB:
 
     # OpsTrade
     def sBtcInsertOps(self,o):
-        self.sql='insert into wb_ops(exn,kp,ddtime,price,vol,direction,profit,rea,pol_name,para) values(' \
+        self.sql='insert into wb_ops(exn,kp,ddtime,price,vol,direction,profit,rea_id,' \
+                 'rea,pol_name,para) values(' \
                     '\''+o['exn']+'\',' \
                     '\''+o['kp']+'\',' \
                     '\''+o['ddtime']+'\',' \
@@ -127,11 +128,12 @@ class A_SDB:
                     '' + str(o['vol']) + ',' \
                     '\'' + str(o['direction'])+ '\', ' \
                     '' + str(o['profit']) + ',' \
+                    '\''+o['rea_id']+'\',' \
                     '\''+o['rea']+'\',' \
                     '\''+o['pol_name']+'\',' \
                     '\''+o['para']+'\'' \
                     ')'
-        self.DMLSql(logflag=False)
+        self.DMLSql(logflag=True)
 
     def sBtcLoadLastOps(self,o):
         self.sql='select * from wb_ops where exn=' \

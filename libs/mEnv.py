@@ -31,7 +31,7 @@ env_dbinfo={
         # 'db_port': 3306,
 
         # mengzhao basic
-        # 'db_host':'47.96.10.189',
+        # 'db_host':'47.97.189.0',
         # 'db_port': 13821,
         # 'db_user':'stock',
         # 'db_passwd':'123',
@@ -41,8 +41,8 @@ env_dbinfo={
         # 'db_port': 13821,
         # 'db_user':'stock',
         # 'db_passwd':'123',
-        'db_host':'47.96.10.189',
-        'db_port': 13821,
+        'db_host':'106.14.2.14',
+        'db_port': 3306,
         'db_user':'stock',
         'db_passwd':'123',
 
@@ -51,7 +51,7 @@ env_dbinfo={
         'db_conn_num':5
     },
     'test':{
-        'db_host': 'rm-bp13779hov3wrck4go.mysql.rds.aliyuncs.com',
+        'db_host': '106.14.2.14',
         'db_user': 'stock',
         'db_passwd': '123',
         'db_name': 'stock',
@@ -60,7 +60,7 @@ env_dbinfo={
         'db_conn_num': 3
     },
      'work':{
-        'db_host': 'rm-bp1rqx1ig1rzp85v0.mysql.rds.aliyuncs.com',
+        'db_host': '106.14.2.14',
         'db_user': 'stock',
         'db_passwd': '123',
         'db_name': 'stock',
@@ -69,8 +69,8 @@ env_dbinfo={
         'db_conn_num': 5
     },
      'work_out':{
-        'db_host':'47.96.10.189',
-        'db_port': 13821,
+        'db_host':'106.14.2.14',
+        'db_port': 3306,
         'db_user':'stock',
         'db_passwd':'123',
         'db_name':'stock',
@@ -80,8 +80,8 @@ env_dbinfo={
      'work_hy':{
         # 'db_host':'rm-bp1p10y33k41b2u94.mysql.rds.aliyuncs.com',
         # 'db_port': 3306,
-        'db_host':'47.96.10.189',
-        'db_port': 13821,
+        'db_host':'106.14.2.14',
+        'db_port': 3306,
         'db_user':'stock',
         'db_passwd':'123',
         'db_name':'stock',

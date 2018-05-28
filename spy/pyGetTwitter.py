@@ -50,7 +50,7 @@ from upyun import print_reporter
 
 
 bucket_name='shortimgae'
-up = upyun.UpYun(bucket_name, 'adminrw', '4444dddd@', timeout=60, endpoint=upyun.ED_AUTO)
+up = upyun.UpYun(bucket_name, 'adminrw', '4444dddd@', timeout=600, endpoint=upyun.ED_AUTO)
 
 
 def uploadFromLocal(fname,fobj):
@@ -68,7 +68,13 @@ def downFromSource(url,write_to_fname,write_to_dir):
 
 for i in range(len(rtn)):
     try:
-        public_tweets = api.user_timeline(u8(rtn[i]['name']),tweet_mode='extended',count=10)
+        public_tweets = api.user_timeline(u8(rtn[i]['name']),tweet_mode='extended',count=10,
+                              include_rts=True,
+                              cards_platform='Web-12', include_want_retweets=1,
+                              include_mute_edge=1, include_ext_alt_text=1, skip_status=1,
+                              include_cards=True, include_can_dm=1, include_user_entities=1,
+                              include_ext_media_color=1,
+                              include_entities=1)
         img_cc=0
         for tweet in public_tweets:
             # print tweet
@@ -92,7 +98,7 @@ for i in range(len(rtn)):
             if img_cc <= 1:
                 o['b'] = 'a'
                 o['ava'] = u8(tweet.user.profile_image_url_https).replace('normal', 'bigger')
-                o['screen_name'] = u8(tweet.user.screen_name)
+                o['screen_name'] = u8(tweet.user.name)
                 fname_img_ava = o['ava'].split('/')[-1]
                 # 下载头像图片
                 downFromSource(o['ava'], fname_img_ava, 'ava')
@@ -111,9 +117,19 @@ for i in range(len(rtn)):
 
 
             # 多媒体图像
-            logger.debug(tweet.full_text)
+
+            # print tweet.full_text
+            # print tweet
+            #
+            # time.sleep(2)
+            if len(tweet.entities['urls'])>0:
+                logger.debug('外链:'+u8(tweet.entities['urls'][0]['expanded_url']))
+                o['out_type'] = 'article'
+                o['out_media'] = u8(tweet.entities['urls'][0]['expanded_url'])
+
             if hasattr(tweet, 'extended_entities'):
                 # print json.dumps(tweet.extended_entities, indent=2)
+                logger.debug('有扩展')
                 media_sets=tweet.extended_entities['media']
                 for j in range(len(media_sets)):
                     #break 代表只取第一张
@@ -121,6 +137,7 @@ for i in range(len(rtn)):
                         o['out_type']='img'
                         o['out_media']=u8(media_sets[j]['media_url'])
                         fname_img_sucai=o['out_media'].split('/')[-1]
+                        fname_img_sucai=fname_img_sucai.split('?')[0]
                         downFromSource(o['out_media'], fname_img_sucai, 'sucai')
                         o['out_media']=fname_img_sucai
                         break
@@ -129,6 +146,7 @@ for i in range(len(rtn)):
                         video_info=u8(media_sets[j]['video_info']['variants'][0]['url'])
                         o['out_media']=video_info
                         fname_video_sucai = o['out_media'].split('/')[-1]
+                        fname_video_sucai=fname_video_sucai.split('?')[0]
                         downFromSource(o['out_media'], fname_video_sucai, 'sucai')
                         o['out_media']=fname_video_sucai
                         break
@@ -143,6 +161,7 @@ for i in range(len(rtn)):
                 for j in range(len(media_sets)):
                     if media_sets[j]['type']==u'photo':
                         so={}
+                        so['id']=(o['mp_sn']+mUtil.random_str(4)).upper()
                         so['mp_sn']=o['mp_sn']
                         o['out_media']=u8(media_sets[j]['media_url'])
                         fname_img_sucai=o['out_media'].split('/')[-1]

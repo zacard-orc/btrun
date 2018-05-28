@@ -111,6 +111,7 @@ for i in range(len(rtn)):
                     # TODO 取出所有的素材
                     for m in range(len(mblog['pics'])):
                         so={}
+                        so['id']=(o['mp_sn']+mUtil.random_str(4)).upper()
                         so['mp_sn']=o['mp_sn']
                         so['sc_url']=u8(mblog['pics'][m]['large']['url'])
                         so['sc_type']='img'

@@ -40,7 +40,7 @@ kp_coin_uniq={}
 #              'nasusdt','htusdt','hsrusdt','qtumusdt','iostusdt','neousdt','sntusdt',
 #              'elaeth','chateth','thetaeth','mdseth','omgeth','storjusdt'
 #     ,'ocneth','itceth','dgdeth','evxeth','btmeth']
-kp_scale=5
+kp_scale=4
 
 def wh():
     base_url='https://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote'
