@@ -54,8 +54,12 @@ def api_commtxpair():
 
 
 
-def api_dealhis(kp='btcusdt'):
-    base_url=dom_url+'/market/history/trade?size=400&symbol='+kp
+def api_dealhis(kp='btcusdt',avg_count=102):
+
+    if avg_count<100:
+        base_url=dom_url+'/market/history/trade?size=100&symbol='+kp
+    else:
+        base_url=dom_url+'/market/history/trade?size=400&symbol='+kp
 
     resHttpText = mHTTP.spyHTTP3(p_url=base_url,p_machinetype='h5')
     if type(resHttpText) is int:
@@ -152,13 +156,14 @@ def api_kline(tp=5,kp='btcusdt'):
 
     data=rtn['data']
 
+    avg_count=0
 
     for i in range(len(data)):
         # print data[i]
         o={}
         o['exg']='HB'
         o['tp']=str(tp)
-        o['kp']=kp
+        o['kp']=kp.split('usdt')[0].upper()
         o['kutc']=mUtil.UTCtoSTDStamp(data[i]['id'])
         o['amount']=data[i]['amount'] #成交量
         o['count']=data[i]['count'] #笔数
@@ -168,24 +173,33 @@ def api_kline(tp=5,kp='btcusdt'):
         o['open']=data[i]['open']
         o['close']=data[i]['close']
 
+        avg_count+=o['count']
         insdb.sBtcMarkKlineNMW(o)
 
-    api_dealhis(kp)
+    avg_count_k=avg_count/len(data)
+
+    api_dealhis(kp,avg_count_k)
 
 
 
 
 
 
-
+kp_scale=4
 def runCollect():
-    for i in range(len(kp_coin)):
-        try:
-            # print kp_coin
-            api_kline(tp=5,kp=kp_coin[i])
-            time.sleep(1)
-        except Exception,e:
-            logger.debug('[OHS]' + traceback.format_exc())
+    logger.debug('共'+str(len(kp_coin))+'交易对')
+    if len(sys.argv)>1:
+        num_split_kp=int(sys.argv[1])
+        logger.debug('kp_split:'+sys.argv[1])
+        for i in range(len(kp_coin)):
+            if i % kp_scale == num_split_kp:
+                try:
+                    # print kp_coin
+                    api_kline(tp=5,kp=kp_coin[i])
+                except Exception,e:
+                    logger.debug('[OHS]' + traceback.format_exc())
+    else:
+        logger.debug('缺少第二个参数')
 
 
 
@@ -197,8 +211,8 @@ while True:
         kp_coin_uniq = {}
         api_commtxpair()
         runCollect()
-
-        time.sleep(60)
+        logger.debug('[WAIT NEXT]')
+        time.sleep(20)
     except Exception,e:
         tk_msg = traceback.format_exc()
         logger.debug('[OHS],' + tk_msg)

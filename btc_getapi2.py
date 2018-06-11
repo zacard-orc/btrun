@@ -442,7 +442,7 @@ if os.getenv('PYVV')=='work_hy':
                 logger.debug('标记为0的过滤USDT')
                 wh()
                 api_otcusdt()
-            # runCollect()
+            runCollect()
             time.sleep(60)
         except Exception,e:
             logger.debug('[OHS]' + traceback.format_exc())
