@@ -34,6 +34,7 @@ def uyUpload(p_bucket,p_fname,p_data):
     r = sess.put(p_url, headers=myheaders, timeout=60, verify=False,data=p_data)
 
 
+
 def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='get',p_data=None,p_header=None):
     FateIp=mUtil.genFateIP()
     print p_url
@@ -76,13 +77,13 @@ def spyHTTP3(p_url,p_machinetype='macpc',p_referer=None,p_proxy=None,p_mehtod='g
 
     try:
         if p_mehtod=='get':
-            r = sess.get(p_url,headers=myheaders,timeout=5,verify=False)
+            r = sess.get(p_url,headers=myheaders,timeout=20,verify=False,proxies=p_proxy)
             logging.debug(r.url)
         if p_mehtod=='post':
-            r = sess.post(p_url, headers=myheaders, timeout=5,data=p_data,verify=False)
+            r = sess.post(p_url, headers=myheaders, timeout=5,data=p_data,verify=False,proxies=p_proxy)
             logging.debug(r.url)
         if p_mehtod=='head':
-            r = sess.head(p_url, headers=myheaders, timeout=5,verify=False)
+            r = sess.head(p_url, headers=myheaders, timeout=5,verify=False,proxies=p_proxy)
             logging.debug(r.url)
     except requests.exceptions.ConnectionError,fe:
         logging.error('HTTPERROR/'+str(fe.message))
