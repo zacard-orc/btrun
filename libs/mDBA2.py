@@ -196,6 +196,23 @@ class A_SDB:
         logging.debug('插入 '+str(o['kp'])+'行情')
         self.DMLSql(logflag=True)
 
+    def sBtcMarkKlineNMW(self,o):
+        self.sql = 'replace into wb_kline ' \
+                   ' values (' \
+                    '\''+o['exg']+'\',' \
+                    '\''+o['kp']+'\',' \
+                    '\''+o['kutc']+'\','\
+                    +str(o['open'])+','\
+                    +str(o['close']) + ','\
+                    + str(o['high']) + ',' \
+                    + str(o['low']) + ',' \
+                    + str(o['amount']) + ','\
+                     + str(o['count']) + ',' \
+                     + str(o['vol']) + ')'
+                     # + str(o['s1_a']) + ',now())'
+        logging.debug('插入 '+str(o['kp'])+'行情')
+        self.DMLSql(logflag=True)
+
     def sUsdtMarketInsert(self,o):
         self.sql = 'replace into wb_usdt ' \
                    ' values (' \
