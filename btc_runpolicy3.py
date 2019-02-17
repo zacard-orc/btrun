@@ -71,10 +71,10 @@ def api_getRunData():
             #p_ma30操作
             '''
             场景一：
-            价格在ma30附近0.2%
-            ma5开口向上0.2%并且开口向上，可以捡第一次，可以捡第二次
+            价格在ma30下方0.3%
+            ma5开口向上0.3%并且开口向上，可以捡第一次，可以捡第二次在m30上方
             '''
-            if (real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']<=-0.2 and \
+            if (real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']<=-0.3 and \
                real_rtn['angle_v_ma5']>9:
                 #进行买入判断
                 if len(opsrtn)>0 and opsrtn[0]['direction']=='buy':
@@ -136,9 +136,8 @@ def api_getRunData():
             没有爬上ma30，反而朝下了
             超过0.5的比例，掉头向下了
             '''
-            # if (real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']<=-0.2 or \
-            #    (real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']>0.5 and real_rtn['angle_v_ma5']<-30:
-            #
+            # if (real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']<=-0.4 or \
+            #     real_rtn['angle_v_ma5']<-30:
             #
             #     #进行卖出判断
             #     if len(opsrtn)==0 or opsrtn[0]['direction'] == 'sell':
@@ -155,7 +154,7 @@ def api_getRunData():
             #     o['profit'] = profit-fee
             #     o['pol_name']='p_ma30|'+kp
             #     o['rea_id'] = 'S3'
-            #     o['rea'] = '下方[低于KP5=5,MA30] 卖出'
+            #     o['rea'] = '再次下方[低于KP5=5,MA30] 卖出'
             #     o['para']=str(real_rtn['p_ma30'])+',ag5='+str(real_rtn['angle_v_ma5'])+',dlt='+str((real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30'])
             #     logger.debug(o['rea_id']+','+o['rea']+','+str(real_rtn['close']))
             #     insdb.sBtcInsertOps(o)
@@ -165,34 +164,35 @@ def api_getRunData():
             必须强制盈利才肯抛出并且MA30上方调头，死多头
             '''
 
-            profit = real_rtn['close'] - opsrtn[0]['price']
-            fee = (opsrtn[0]['price'] + real_rtn['close']) * 0.002
-            real_profit=profit-fee
+            if len(opsrtn)>0:
+                profit = real_rtn['close'] - opsrtn[0]['price']
+                fee = (opsrtn[0]['price'] + real_rtn['close']) * 0.002
+                real_profit=profit-fee
 
-            if ((real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']>0.5 or
-                real_profit*100/opsrtn[0]['price'] > 1) and real_rtn['angle_v_ma5'] < -20:
+                if ((real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']>0.5 or
+                    real_profit*100/opsrtn[0]['price'] > 1) and real_rtn['angle_v_ma5'] < -20:
 
-                # 进行卖出判断
-                if len(opsrtn) == 0 or opsrtn[0]['direction'] == 'sell':
-                    logger.debug('S3-已卖出,无需再次卖出')
-                    continue
+                    # 进行卖出判断
+                    if len(opsrtn) == 0 or opsrtn[0]['direction'] == 'sell':
+                        logger.debug('S3-已卖出,无需再次卖出')
+                        continue
 
 
-                o['ddtime'] = mUtil.TimeStampNowStr()
-                o['direction'] = 'sell'
-                o['price'] = real_rtn['close']
-                # if profit>0:
-                #     o['profit'] = profit-fee
-                # else:
-                o['profit'] = profit - fee
-                o['pol_name'] = 'p_ma30|' + kp
-                o['rea_id'] = 'S4'
-                o['rea'] = '强制锁定收益 卖出'
-                o['para'] = 'buy_price='+str(opsrtn[0]['price'])\
-                            +'p_ma30='+str(real_rtn['p_ma30'])+',ag5='+str(real_rtn['angle_v_ma5'])\
-                            +',dlt=' + str((real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30'])
-                logger.debug(o['rea_id'] + ',' + o['rea'] + ',' + str(real_rtn['close']))
-                insdb.sBtcInsertOps(o)
+                    o['ddtime'] = mUtil.TimeStampNowStr()
+                    o['direction'] = 'sell'
+                    o['price'] = real_rtn['close']
+                    # if profit>0:
+                    #     o['profit'] = profit-fee
+                    # else:
+                    o['profit'] = profit - fee
+                    o['pol_name'] = 'p_ma30|' + kp
+                    o['rea_id'] = 'S4'
+                    o['rea'] = '强制锁定收益 卖出'
+                    o['para'] = 'buy_price='+str(opsrtn[0]['price'])\
+                                +'p_ma30='+str(real_rtn['p_ma30'])+',ag5='+str(real_rtn['angle_v_ma5'])\
+                                +',dlt=' + str((real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30'])
+                    logger.debug(o['rea_id'] + ',' + o['rea'] + ',' + str(real_rtn['close']))
+                    insdb.sBtcInsertOps(o)
 
     except Exception, e:
         logger.error('[ERR],' + e.message)

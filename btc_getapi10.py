@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-# 火币 K历史K线
+# 火币 K历史K线 为了牛魔王
 
 from __future__ import division
 import os,json,sys,time,xml,datetime,traceback,thread

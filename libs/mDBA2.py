@@ -37,8 +37,20 @@ class A_SDB:
     def __init__(self):
         self.sql=''
 
+    # ETH数据源
+    def sLoadEthKline(self,o):
+        self.sql='select * from wb_kline_4q where exn=\'HB\' and kp=' \
+                    '\''+o['kp']+'\' ' \
+                  'and kutc > date_add(now(),interval -5 minute) order by kutc'
+        return self.OpsSql()
 
-    # Data 米匡
+    # USDT
+    def sLoadUsdtKline(self):
+        self.sql='select * from wb_usdt where exn=\'HB\' ' \
+                  'and kutc > date_add(now(),interval -5 minute) order by kutc'
+        return self.OpsSql()
+
+    # Data 牛魔王
     def sDataRQInsertKLine(self,o):
         self.sql = 'replace into wb_kline_rq ' \
                    ' values (' \
@@ -77,6 +89,19 @@ class A_SDB:
                  'order by kp,kutc '
         return self.OpsSql()
 
+    def sInsertNMWKline(self,o):
+        self.sql='insert into ta_kline(ddtime,symbol,kp,open,close,high,low,ambuy,amsell) values (' \
+            '\''+o['ddtime']+'\',' \
+            '\''+o['symbol']+'\', ' \
+            '\''+o['kp']+'\',' \
+            +str(o['open'])+',' \
+            +str(o['close'])+',' \
+            +str(o['high'])+',' \
+            +str(o['low'])+',' \
+            +str(o['ambuy'])+',' \
+            +str(o['amsell'])+')'
+        return self.OpsSql()
+
     # Radar Append PushMsg
     def sPushMsg(self,o):
         self.sql='insert into wb_pushmsg(msg_type,kp,exn,kutc,close,msg_value,msg_body,createAt) values (' \
@@ -112,7 +137,7 @@ class A_SDB:
         return self.OpsSql()
 
     def sLoadKLineForPolicyBase(self,o):
-        self.sql='select * from wb_kline where kp=\''+o['kp']+'\'' \
+        self.sql='select * from wb_kline_4q where kp=\''+o['kp']+'\'' \
                  ' and kutc > date_add(now(),interval -10 minute)   ' \
                  '  order by kutc desc'
         return self.OpsSql()
@@ -196,6 +221,28 @@ class A_SDB:
         logging.debug('插入 '+str(o['kp'])+'行情')
         self.DMLSql(logflag=True)
 
+
+    def sBtcMarkKline4Q(self,o):
+        self.sql = 'replace into wb_kline_4q ' \
+                   ' values (' \
+                    '\''+o['exn']+'\',' \
+                    '\''+o['kp']+'\',' \
+                    '\''+o['kutc']+'\','\
+                    +str(o['close'])+','\
+                    +str(o['p_ma5']) + ','\
+                    + str(o['p_ma30']) + ',' \
+                    + str(o['p_ma60']) + ',' \
+                    + str(o['angle_v_ma5']) + ','\
+                     + str(o['angle_v_ma30']) + ',' \
+                     + str(o['angle_v_ma60']) + ',' \
+                     + str(o['his_high']) + ',' \
+                     + str(o['his_low']) + ',' \
+                     + str(o['buy_q']) + ',' \
+                     + str(o['sell_q']) + ',' \
+                     'now())'
+        logging.debug('插入 '+str(o['kp'])+'行情')
+        self.DMLSql(logflag=True)
+
     def sBtcMarkKlineNMW(self,o):
         self.sql = 'replace into wb_kline ' \
                    ' values (' \
@@ -211,6 +258,15 @@ class A_SDB:
                      + str(o['vol']) + ')'
                      # + str(o['s1_a']) + ',now())'
         logging.debug('插入 '+str(o['kp'])+'行情')
+        self.DMLSql(logflag=True)
+
+    def sBtcIndexNMW(self,o):
+        self.sql = 'insert into wb_index(type,price) ' \
+                   ' values (' \
+                    '\''+o['type']+'\',' \
+                    +str(o['price'])+')'
+                     # + str(o['s1_a']) + ',now())'
+        logging.debug('插入指数')
         self.DMLSql(logflag=True)
 
     def sUsdtMarketInsert(self,o):
