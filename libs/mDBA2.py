@@ -228,6 +228,7 @@ class A_SDB:
                     '\''+o['exn']+'\',' \
                     '\''+o['kp']+'\',' \
                     '\''+o['kutc']+'\','\
+                    +str(o['open'])+','\
                     +str(o['close'])+','\
                     +str(o['p_ma5']) + ','\
                     + str(o['p_ma30']) + ',' \
@@ -235,8 +236,11 @@ class A_SDB:
                     + str(o['angle_v_ma5']) + ','\
                      + str(o['angle_v_ma30']) + ',' \
                      + str(o['angle_v_ma60']) + ',' \
-                     + str(o['his_high']) + ',' \
-                     + str(o['his_low']) + ',' \
+                     + str(o['high']) + ',' \
+                     + str(o['low']) + ',' \
+                     + str(o['amount']) + ',' \
+                     + str(o['vol']) + ',' \
+                     + str(o['vcount']) + ',' \
                      + str(o['buy_q']) + ',' \
                      + str(o['sell_q']) + ',' \
                      'now())'

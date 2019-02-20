@@ -40,7 +40,8 @@ kp_coin_uniq={}
 #              'nasusdt','htusdt','hsrusdt','qtumusdt','iostusdt','neousdt','sntusdt',
 #              'elaeth','chateth','thetaeth','mdseth','omgeth','storjusdt'
 #     ,'ocneth','itceth','dgdeth','evxeth','btmeth']
-kp_coin=['ethusdt','btcusdt','bchusdt']
+kp_coin=['ethusdt','btcusdt','bchusdt','eosusdt','xrpusdt','htusdt']
+# kp_coin=['ethusdt']
 
 kp_scale=1
 
@@ -97,7 +98,7 @@ def wh():
 
 
 
-def api_kline(tp=5,kp='btcusdt'):
+def api_kline(tp=15,kp='btcusdt'):
     perd=''
     if tp==1:
         perd='1min'
@@ -108,7 +109,7 @@ def api_kline(tp=5,kp='btcusdt'):
     if tp==3600:
         perd='1day'
 
-    base_url=dom_url+'/market/history/kline?period='+perd+'&size=70&symbol='+kp
+    base_url=dom_url+'/market/history/kline?period='+perd+'&size=80&symbol='+kp
 
     resHttpText = mHTTP.spyHTTP3(p_url=base_url)
     if type(resHttpText) is int:
@@ -127,6 +128,7 @@ def api_kline(tp=5,kp='btcusdt'):
     his_low=[]
     for i in range(len(data)):
         # print data[i]
+        # print data[i]['id']
         o={}
         o['exn']='HB'
         o['tp']=str(tp)
@@ -139,6 +141,7 @@ def api_kline(tp=5,kp='btcusdt'):
         o['low']=data[i]['low']
         o['open']=data[i]['open']
         o['close']=data[i]['close']
+        o['vcount']=data[i]['count']
         ma_raw.append(o)
         his_high.append(o['high'])
         his_low.append(o['low'])
@@ -189,19 +192,27 @@ def api_kline(tp=5,kp='btcusdt'):
     rtn_o={}
     rtn_o['kp']=kp
     rtn_o['exn']='HB'
+    rtn_o['kutc']=ma_raw[0]['kutc']
     rtn_o['p_ma5']=ma_raw[0]['p_ma5']
     rtn_o['p_ma30']=ma_raw[0]['p_ma30']
     rtn_o['p_ma60']=ma_raw[0]['p_ma60']
     rtn_o['angle_v_ma5']= mUtil.getAngleByKRate(grad_v_ma5)
     rtn_o['angle_v_ma30']= mUtil.getAngleByKRate(grad_v_ma30)
     rtn_o['angle_v_ma60']= mUtil.getAngleByKRate(grad_v_ma60)
+    rtn_o['open']=ma_raw[0]['open']
     rtn_o['close']=ma_raw[0]['close']
-    rtn_o['his_high']=max(his_high)
-    rtn_o['his_low']=min(his_low)
+    # rtn_o['his_high']=max(his_high)
+    # rtn_o['his_low']=min(his_low)
+    rtn_o['high']=ma_raw[0]['high']
+    rtn_o['low']=ma_raw[0]['low']
+    rtn_o['amount']=ma_raw[0]['amount']
+    rtn_o['vol']=ma_raw[0]['vol']
+    rtn_o['vcount']=ma_raw[0]['vcount']
 
     dps=api_depth(kp)
     rtn_o['buy_q']=dps[0]
     rtn_o['sell_q']=dps[1]
+
 
     return rtn_o
 
@@ -346,14 +357,14 @@ def runCollect():
         for i in range(len(kp_coin)):
             if i % kp_scale == num_split_kp:
                 try:
-                    ko1=api_kline(tp=5,kp=kp_coin[i])
+                    ko1=api_kline(tp=15,kp=kp_coin[i])
                     # ko2=api_merged(kp_coin[i])
                     # api_dealhis(kp_coin[i])
-                    dictMerged1 = dict(ko1.items())
+                    # dictMerged1 = dict(ko1.items())
                     # dictMerged1 = dict(ko1.items() + ko2.items())
 
-                    dictMerged1['kutc']=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:00')
-                    insdb.sBtcMarkKline4Q(dictMerged1)
+                    # dictMerged1['kutc']=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:00')
+                    insdb.sBtcMarkKline4Q(ko1)
                 except Exception,e:
                     logger.debug('[OHS]' + traceback.format_exc())
     else:
@@ -370,16 +381,16 @@ def api_otcusdt():
     dst = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:00')
 
     #sell
-    # for i in range(0,5):
-    #     o={}
-    #     o['exn']='HB'
-    #     o['kutc']=dst
-    #     o['sort_id']=i+1
-    #     o['direction']='sell'
-    #     o['price']=rtn[i]['price']
-    #     o['r_min']=rtn[i]['minTradeLimit']
-    #     o['r_max']=rtn[i]['maxTradeLimit']
-    #     insdb.sUsdtMarketInsert(o)
+    for i in range(0,1):
+        o={}
+        o['exn']='HB'
+        o['kutc']=dst
+        o['sort_id']=i+1
+        o['direction']='sell'
+        o['price']=rtn[i]['price']
+        o['r_min']=rtn[i]['minTradeLimit']
+        o['r_max']=rtn[i]['maxTradeLimit']
+        insdb.sUsdtMarketInsert(o)
 
     #buy
     pageRtn = mHTTP.spyHTTP3(bul_base_url)
@@ -396,32 +407,32 @@ def api_otcusdt():
         o['r_max'] = rtn[i]['maxTradeLimit']
         insdb.sUsdtMarketInsert(o)
 
-# def api_depth(kp='btcusdt'):
-#     base_url = dom_url + '/market/depth?symbol='+kp+'&type=step5'
-#     resHttpText = mHTTP.spyHTTP3(p_url=base_url)
-#
-#     if type(resHttpText) is int:
-#         logger.debug('http异常')
-#         return -1
-#
-#     rtn=json.loads(resHttpText)
-#     if rtn['status']<>u'ok':
-#         return -2
-#
-#     data=rtn['tick']
-#
-#     #买盘
-#     bids_data=data['bids']
-#     bsum=0
-#     for i in range(len(bids_data)):
-#         bsum+=bids_data[i][1]
-#
-#     # 卖盘
-#     asks_data = data['asks']
-#     asum = 0
-#     for i in range(len(asks_data)):
-#         asum += asks_data[i][1]
-#     return (bsum,asum)
+def api_depth(kp='btcusdt'):
+    base_url = dom_url + '/market/depth?symbol='+kp+'&type=step5'
+    resHttpText = mHTTP.spyHTTP3(p_url=base_url)
+
+    if type(resHttpText) is int:
+        logger.debug('http异常')
+        return -1
+
+    rtn=json.loads(resHttpText)
+    if rtn['status']<>u'ok':
+        return -2
+
+    data=rtn['tick']
+
+    #买盘
+    bids_data=data['bids']
+    bsum=0
+    for i in range(len(bids_data)):
+        bsum+=bids_data[i][1]
+
+    # 卖盘
+    asks_data = data['asks']
+    asum = 0
+    for i in range(len(asks_data)):
+        asum += asks_data[i][1]
+    return (bsum,asum)
 
 # wh() #外汇
 # api_commtxpair()
@@ -449,7 +460,7 @@ if os.getenv('PYVV')=='work':
                 # wh()
                 api_otcusdt()
             runCollect()
-            time.sleep(30)
+            time.sleep(10)
         except Exception,e:
             logger.debug('[OHS]' + traceback.format_exc())
             # time.sleep(5)
