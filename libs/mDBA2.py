@@ -136,15 +136,20 @@ class A_SDB:
                  ' and tp='+o['tp']+' order by kutc desc'
         return self.OpsSql()
 
-    def sLoadKLineForPolicyBase(self,o):
+    def sLoadKLineForPolicyLast(self,o):
         self.sql='select * from wb_kline_4q where kp=\''+o['kp']+'\'' \
-                 ' and kutc > date_add(now(),interval -10 minute)   ' \
-                 '  order by kutc desc'
+                 ' and kutc > date_add(now(),interval -20 minute)   ' \
+                 '  order by kutc desc limit 1'
+        return self.OpsSql()
+
+    def sLoadKLineForPolicyHis(self,o):
+        self.sql='select * from wb_kline_4q where kp=\''+o['kp']+'\'' \
+                 ' order by kutc '
         return self.OpsSql()
 
     # OpsTrade
     def sBtcInsertOps(self,o):
-        self.sql='insert into wb_ops(exn,kp,ddtime,price,vol,direction,profit,rea_id,' \
+        self.sql='insert into wb_ops(exn,kp,ddtime,price,vol,direction,profit,' \
                  'rea,pol_name,para) values(' \
                     '\''+o['exn']+'\',' \
                     '\''+o['kp']+'\',' \
@@ -153,7 +158,6 @@ class A_SDB:
                     '' + str(o['vol']) + ',' \
                     '\'' + str(o['direction'])+ '\', ' \
                     '' + str(o['profit']) + ',' \
-                    '\''+o['rea_id']+'\',' \
                     '\''+o['rea']+'\',' \
                     '\''+o['pol_name']+'\',' \
                     '\''+o['para']+'\'' \
@@ -163,7 +167,7 @@ class A_SDB:
     def sBtcLoadLastOps(self,o):
         self.sql='select * from wb_ops where exn=' \
                     '\''+o['exn']+'\' and kp=' \
-                    '\''+o['kp']+'\' and ddtime > date_add(now(),interval -24 hour) order by ddtime desc limit 1'
+                    '\''+o['kp']+'\' and ddtime > date_add(now(),interval -48 hour) order by ddtime desc limit 1'
         return self.OpsSql()
 
 
@@ -231,9 +235,11 @@ class A_SDB:
                     +str(o['open'])+','\
                     +str(o['close'])+','\
                     +str(o['p_ma5']) + ','\
+                    + str(o['p_ma10']) + ',' \
                     + str(o['p_ma30']) + ',' \
                     + str(o['p_ma60']) + ',' \
                     + str(o['angle_v_ma5']) + ','\
+                     + str(o['angle_v_ma10']) + ',' \
                      + str(o['angle_v_ma30']) + ',' \
                      + str(o['angle_v_ma60']) + ',' \
                      + str(o['high']) + ',' \

@@ -151,6 +151,7 @@ def api_kline(tp=15,kp='btcusdt'):
         if i>5:
             continue
         p_ma5_list=[]
+        p_ma10_list=[]
         p_ma30_list=[]
         p_ma60_list=[]
 
@@ -160,10 +161,16 @@ def api_kline(tp=15,kp='btcusdt'):
                 # print j,ma_raw[j]
                 if j<i+5:
                     p_ma5_list.append(ma_raw[j]['close'])
+                    p_ma10_list.append(ma_raw[j]['close'])
                     p_ma30_list.append(ma_raw[j]['close'])
                     p_ma60_list.append(ma_raw[j]['close'])
 
-                if j>=i+5 and j<i+30:
+                if j>=i+5 and j<i+10:
+                    p_ma10_list.append(ma_raw[j]['close'])
+                    p_ma30_list.append(ma_raw[j]['close'])
+                    p_ma60_list.append(ma_raw[j]['close'])
+
+                if j>=i+10 and j<i+30:
                     p_ma30_list.append(ma_raw[j]['close'])
                     p_ma60_list.append(ma_raw[j]['close'])
 
@@ -171,6 +178,7 @@ def api_kline(tp=15,kp='btcusdt'):
                     p_ma60_list.append(ma_raw[j]['close'])
         #10,30,60
         ma_raw[i]['p_ma5']=sum(p_ma5_list)/5
+        ma_raw[i]['p_ma10']=sum(p_ma10_list)/10
         ma_raw[i]['p_ma30']=sum(p_ma30_list)/30
         ma_raw[i]['p_ma60']=sum(p_ma60_list)/60
 
@@ -186,6 +194,7 @@ def api_kline(tp=15,kp='btcusdt'):
 
     side=ma_raw[0]['close']*0.001
     grad_v_ma5=(ma_raw[0]['p_ma5']-ma_raw[1]['p_ma5'])/side
+    grad_v_ma10=(ma_raw[0]['p_ma10']-ma_raw[1]['p_ma10'])/side
     grad_v_ma30=(ma_raw[0]['p_ma30']-ma_raw[1]['p_ma30'])/side
     grad_v_ma60=(ma_raw[0]['p_ma60']-ma_raw[1]['p_ma60'])/side
 
@@ -194,9 +203,11 @@ def api_kline(tp=15,kp='btcusdt'):
     rtn_o['exn']='HB'
     rtn_o['kutc']=ma_raw[0]['kutc']
     rtn_o['p_ma5']=ma_raw[0]['p_ma5']
+    rtn_o['p_ma10']=ma_raw[0]['p_ma10']
     rtn_o['p_ma30']=ma_raw[0]['p_ma30']
     rtn_o['p_ma60']=ma_raw[0]['p_ma60']
     rtn_o['angle_v_ma5']= mUtil.getAngleByKRate(grad_v_ma5)
+    rtn_o['angle_v_ma10']= mUtil.getAngleByKRate(grad_v_ma10)
     rtn_o['angle_v_ma30']= mUtil.getAngleByKRate(grad_v_ma30)
     rtn_o['angle_v_ma60']= mUtil.getAngleByKRate(grad_v_ma60)
     rtn_o['open']=ma_raw[0]['open']
