@@ -42,7 +42,7 @@ gf_pol=[
     },
     {
         'pol_name': 'pol_sell_inflex',
-        'pol_threshold1': 0.3
+        'pol_threshold1': 0.2
     },
 ]
 
@@ -68,6 +68,9 @@ kp_coin=['ethusdt']
 def api_getRunData(mode='real'):
 
     try:
+        if mode != 'real':
+            insdb.sBtcClearDevOps()
+
         for i in range(len(kp_coin)):
             o = {}
             kp = kp_coin[i]
@@ -83,15 +86,6 @@ def api_getRunData(mode='real'):
 
             for j in range(len(rtn)):
                 real_rtn = rtn[j]
-                # pct_diff_ma30=(real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']
-                # logger.debug(kp
-                #              +','+str(real_rtn['close'])
-                #              +','+str(round(real_rtn['p_ma30'],4))
-                #              +','+str(round(pct_diff_ma30,4))
-                #              +','+str(real_rtn['angle_v_ma5'])
-                #              +','+str(real_rtn['angle_v_ma30'])
-                #              )
-                #p_ma30操作
                 '''
                 场景一：
                 价格在maXX下方0.3%
@@ -130,7 +124,7 @@ def api_getRunData(mode='real'):
                 # logger.debug(str(sum(ag5_0+ag5_1+ag5_2)))
                 # logger.debug(str(sum(ag5_0+ag5_1+ag5_2)/3))
 
-                cond1=real_rtn['angle_v_ma5']>0 and real_rtn['angle_v_ma30']>0 and real_rtn['angle_v_ma60']>0
+                cond1=real_rtn['angle_v_ma5']>0 and real_rtn['angle_v_ma30']>0
                 cond2=real_rtn['angle_v_ma5']>real_rtn['angle_v_ma30']
 
                 if (real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']<=gf_pol[1]['pol_threshold1'] \
@@ -193,7 +187,7 @@ def api_getRunData(mode='real'):
                 # if ((real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']>0.5 or
                 #     real_profit*100/opsrtn[0]['price'] > 1) and real_rtn['angle_v_ma5'] < -20:
 
-                cond1=real_rtn['angle_v_ma5']<0 and real_rtn['angle_v_ma30']<0 and real_rtn['angle_v_ma60']<0
+                cond1=real_rtn['angle_v_ma5']<0
                 cond2=real_rtn['angle_v_ma5']<real_rtn['angle_v_ma30']
                 cond3=(real_rtn['close']-real_rtn['p_ma30'])*100/real_rtn['p_ma30']
                 if cond1 and cond2 and cond3 > gf_pol[3]['pol_threshold1']:
@@ -230,9 +224,15 @@ def api_getRunData(mode='real'):
 # api_getRunData()
 # logger.debug('结束')
 
+print os.getenv('PYVV')
+if os.getenv('PYVV') == 'dev':
+    api_getRunData()
+    sumRtn=insdb.sBtcSumDevProfit()
+    logger.info(sumRtn[0].sumpft)
 
-while True:
-    api_getRunData(mode='train')
+if os.getenv('PYVV')=='work':
+    while True:
+        api_getRunData(mode='train')
     # time.sleep(10)
 
 

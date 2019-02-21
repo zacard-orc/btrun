@@ -170,6 +170,14 @@ class A_SDB:
                     '\''+o['kp']+'\' and ddtime > date_add(now(),interval -48 hour) order by ddtime desc limit 1'
         return self.OpsSql()
 
+    def sBtcClearDevOps(self):
+        self.sql='delete from wb_ops where env=\'dev\';'
+        self.DMLSql()
+
+    def sBtcSumDevProfit(self):
+        self.sql='select sum(profit) as sumpft from wb_ops where env=\'dev\';'
+        return self.OpsSql()
+
 
     # Insert Or Update
     def sBtcMarkInsert(self,o):
