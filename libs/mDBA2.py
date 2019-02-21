@@ -149,11 +149,13 @@ class A_SDB:
 
     # OpsTrade
     def sBtcInsertOps(self,o):
-        self.sql='insert into wb_ops(exn,kp,ddtime,price,vol,direction,profit,' \
+        self.sql='insert into wb_ops(env,exn,kp,ddtime,ddtime_snap,price,vol,direction,profit,' \
                  'rea,pol_name,para) values(' \
+                    '\''+o['env']+'\',' \
                     '\''+o['exn']+'\',' \
                     '\''+o['kp']+'\',' \
                     '\''+o['ddtime']+'\',' \
+                    '\''+o['ddtime_snap']+'\',' \
                     '' + str(o['price']) + ',' \
                     '' + str(o['vol']) + ',' \
                     '\'' + str(o['direction'])+ '\', ' \

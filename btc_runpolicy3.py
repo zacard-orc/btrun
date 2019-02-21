@@ -52,17 +52,7 @@ gf_pol=[
 kp_coin=['ethusdt']
 
 
-# def api_getRealTimeDeal(kp='btcusdt'):
-#     base_url=dom_url+'/market/trade?symbol='+kp
-#     resHttpText = mHTTP.spyHTTP3(p_url=base_url)
-#     if type(resHttpText) is int:
-#         logger.debug('http异常')
-#         return -1
-#     rtn=json.loads(resHttpText,encoding='utf-8')
-#     if rtn['status']<>u'ok':
-#         logger.debug('http busi status 异常')
-#         return -2
-#     return rtn
+
 
 
 def api_getRunData(mode='real'):
@@ -74,6 +64,7 @@ def api_getRunData(mode='real'):
         for i in range(len(kp_coin)):
             o = {}
             kp = kp_coin[i]
+            o['env'] = os.getenv('PYVV')
             o['kp'] = kp
             o['exn'] = 'HB'
             o['vol'] = 1
@@ -226,14 +217,13 @@ def api_getRunData(mode='real'):
 
 print os.getenv('PYVV')
 if os.getenv('PYVV') == 'dev':
-    api_getRunData()
+    api_getRunData(mode='train')
     sumRtn=insdb.sBtcSumDevProfit()
-    logger.info(sumRtn[0].sumpft)
+    logger.info(sumRtn[0]['sumpft'])
 
-if os.getenv('PYVV')=='work':
+if os.getenv('PYVV') == 'work':
     while True:
         api_getRunData(mode='train')
-    # time.sleep(10)
 
 
 
