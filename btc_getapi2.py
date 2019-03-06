@@ -40,7 +40,7 @@ kp_coin_uniq={}
 #              'nasusdt','htusdt','hsrusdt','qtumusdt','iostusdt','neousdt','sntusdt',
 #              'elaeth','chateth','thetaeth','mdseth','omgeth','storjusdt'
 #     ,'ocneth','itceth','dgdeth','evxeth','btmeth']
-kp_coin=['ethusdt','btcusdt','bchusdt','eosusdt','xrpusdt','htusdt']
+kp_coin=['ethusdt','btcusdt','bchusdt','eosusdt','xrpusdt','htusdt','ltcusdt']
 # kp_coin=['ethusdt']
 
 kp_scale=1
