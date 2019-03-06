@@ -33,7 +33,7 @@ gf_pol = [{'pol_name': 'pol_buy_ma30_offset', 'pol_desc': 'ma30下方买入', 'p
 
 # kp_coin=['btcusdt','ethusdt','ltcusdt','eosusdt','neousdt','etcusdt']
 # kp_coin=['btcusdt','ethusdt','bchusdt','htusdt','xrpusdt','eosusdt']
-kp_coin = ['ethusdt']
+kp_coin = ['ethusdt', 'eosusdt', 'bchusdt', 'btcusdt', 'htusdt']
 
 
 def api_getRunData(mode='real'):
@@ -62,11 +62,11 @@ def api_getRunData(mode='real'):
                 场景一：
                 价格在maXX下方0.3%
                 '''
-                logger.debug(str(j))
+                logger.debug('判断数据，'+str(real_rtn['close'])+','+str(real_rtn['p_ma30']))
                 cond1 = (real_rtn['close'] - real_rtn['p_ma30']) * 100 / real_rtn['p_ma30']
                 cond2 = real_rtn['angle_v_ma5'] > 5
                 if cond1 <= -1 and cond2:
-                    msg = kp + ',ma30 downarea,'+str(real_rtn['close'])
+                    msg = 'BBOT,'+kp + ',ma30下方,' + str(real_rtn['close'])
                     logger.debug(msg)
                     mEmail.sendEmail(msg, msg)
 
@@ -76,10 +76,10 @@ def api_getRunData(mode='real'):
                 '''
                 cond1 = real_rtn['angle_v_ma5'] > 0 and real_rtn['angle_v_ma30'] > 0
                 cond2 = real_rtn['angle_v_ma5'] > real_rtn['angle_v_ma30']
-                cond3 = real_rtn['angle_v_ma5'] >= 45
+                cond3 = real_rtn['angle_v_ma5'] >= 55
 
                 if cond1 and cond2 and cond3:
-                    msg = kp + ',rush up,'+str(real_rtn['close'])
+                    msg = 'BBOT,'+kp + ',单边上涨,' + str(real_rtn['close'])+','+str(real_rtn['angle_v_ma5'])
                     logger.debug(msg)
                     mEmail.sendEmail(msg, msg)
 
@@ -102,7 +102,7 @@ def api_getRunData(mode='real'):
                 # cond3 = (real_rtn['close'] - real_rtn['p_ma30']) * 100 / real_rtn['p_ma30']
                 cond4 = real_rtn['close'] > real_rtn['p_ma30']
                 if cond1 and cond4:
-                    msg = kp + ',ma30 up inflex point,'+str(real_rtn['close'])
+                    msg = 'BBOT,'+kp + ',ma30 上方拐点,' + str(real_rtn['close'])
                     logger.debug(msg)
                     mEmail.sendEmail(msg, msg)
 
@@ -113,14 +113,11 @@ def api_getRunData(mode='real'):
         logger.debug('[HS],' + traceback.format_exc())
 
 
-
 if os.getenv('PYVV') == 'dev':
     api_getRunData(mode='real')
-
 
 if os.getenv('PYVV') == 'work':
     while True:
         api_getRunData(mode='real')
-
-
-
+        logger.debug('等待下个监测点')
+        time.sleep(60)

@@ -11,13 +11,13 @@ sender = '13816025562@139.com'
 password = 'love1985'
 smtp_server = 'smtp.139.com'
 
-receivers = ','.join(['llysonylin2012@163.com'])
+receivers = ','.join(['firenews2016@163.com'])
 
 
 def sendEmail(in_sub, in_content):
     # 邮件内容
     msg = MIMEMultipart()
-    msg['Subject'] = in_sub.encode('utf-8')
+    msg['Subject'] = in_sub.encode('gbk')
     msg['From'] = sender
     msg['To'] = receivers
 
@@ -26,7 +26,7 @@ def sendEmail(in_sub, in_content):
     msg.attach(puretext)
 
     try:
-        client = smtplib.SMTP()
+        client = smtplib.SMTP_SSL()
         client.connect(smtp_server)
         client.login(username, password)
         client.sendmail(sender, receivers, msg.as_string())
