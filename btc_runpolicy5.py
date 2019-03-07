@@ -65,11 +65,13 @@ def api_getRunData(mode='real'):
                 '''
                 logger.debug('判断数据，' + str(real_rtn['close']) + ',' + str(real_rtn['p_ma30']))
                 cond1 = (real_rtn['close'] - real_rtn['p_ma30']) * 100 / real_rtn['p_ma30']
-                cond2 = real_rtn['angle_v_ma5'] > 5
+                cond2 = real_rtn['angle_v_ma5'] > 10
                 if cond1 <= -1 and cond2:
-                    msg = 'BBOT,' + kp + ',ma30下方,' + str(real_rtn['close'])
+                    msg = 'BBOT,' + kp + ',ma30下方,' + str(real_rtn['close'])+','+str(real_rtn['angle_v_ma5'])
                     logger.debug(msg)
                     msg_list.append(msg)
+                    # msg_list.append(msg)
+
                     # mEmail.sendEmail(msg, msg)
 
                 '''
@@ -110,10 +112,15 @@ def api_getRunData(mode='real'):
                     msg_list.append(msg)
                     #
 
-        sendMsg = u'\n'.join(msg_list)
-        # print sendMsg
-        # print type(sendMsg)
-        mEmail.sendEmail(sendMsg[:30], sendMsg)
+        if len(msg_list)>0:
+            sendMsg = u'\n'.join(msg_list)
+            # print sendMsg
+            # print type(sendMsg)
+            # mEmail.sendEmail(sendMsg[:30], sendMsg)
+            o={}
+            o['type']='coin'
+            o['msg']=sendMsg
+            insdb.sBtcInsertPushMsg(o)
     except Exception, e:
         print traceback.format_exc()
         logger.debug('[HS],' + traceback.format_exc())

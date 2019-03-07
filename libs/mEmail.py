@@ -45,10 +45,18 @@ def sendEmail(in_sub, in_content):
 import time
 from apns import APNs, Frame, Payload
 
+
 def sendIOS():
-    apns = APNs(use_sandbox=True, cert_file='public.pem', key_file='private.pem')
+    apns = APNs(use_sandbox=True, cert_file='btc123_public.pem', key_file='btc123_private.pem')
 
     # Send a notification
     token_hex = 'be0bbd1c579635e1817605acc3c615608f80fa89a40b7688ee8a45693a961cde'
-    payload = Payload(alert="Hello World!", sound="default", badge=1)
+    payload = Payload(alert=u"\uD83D\uDCE7 \u2709 你好 Hello world!",
+                      sound="default",
+                      badge=1,
+                      content_available=True,
+                      custom={'title': u'行情监控'})
     apns.gateway_server.send_notification(token_hex, payload)
+
+
+# sendIOS()

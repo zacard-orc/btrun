@@ -148,6 +148,10 @@ class A_SDB:
         return self.OpsSql()
 
     # OpsTrade
+    def sBtcInsertPushMsg(self,o):
+        self.sql='insert into wb_push_his(type,msg) values(\''+o['type']+'\',\''+o['msg']+'\')'
+        self.DMLSql()
+
     def sBtcInsertOps(self,o):
         self.sql='insert into wb_ops(env,exn,kp,ddtime,ddtime_snap,price,vol,direction,profit,' \
                  'rea,pol_name,para) values(' \
