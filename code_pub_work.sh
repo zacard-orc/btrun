@@ -24,8 +24,7 @@ tar --exclude='.git' \
 #./code_scp.sh 106.15.193.49 wb tejwXPwZQ4FNx5AX05fv0XSAOMsEUL0xpF7cfSK6QJl6v $proj_name.tar.gz '~/btc'
 #./code_scp.sh 120.27.216.222 wb tejwXPwZQ4FNx5AX05fv0XSAOMsEUL0xpF7cfSK6QJl6v $proj_name.tar.gz '~/btc'
 #./code_scp.sh 47.52.19.237 wb tejwXPwZQ4FNx5AX05fv0XSAOMsEUL0xpF7cfSK6QJl6v $proj_name.tar.gz '~/btc'
-#./code_scp.sh 139.196.121.6 wb tejwXPwZQ4FNx5AX05fv0XSAOMsEUL0xpF7cfSK6QJl6v $proj_name.tar.gz '~/btc'
-
+./code_scp.sh 139.196.121.6 wb tejwXPwZQ4FNx5AX05fv0XSAOMsEUL0xpF7cfSK6QJl6v $proj_name.tar.gz '~/btc'
 ./code_scp.sh 47.52.131.46 wb tejwXPwZQ4FNx5AX05fv0XSAOMsEUL0xpF7cfSK6QJl6v $proj_name.tar.gz '~/btc'
 
 #./code_scp.sh 47.98.53.144 wb tejwXPwZQ4FNx5AX05fv0XSAOMsEUL0xpF7cfSK6QJl6v $proj_name.tar.gz '~/btc'
