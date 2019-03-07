@@ -113,7 +113,7 @@ def api_getRunData(mode='real'):
         sendMsg = u'\n'.join(msg_list)
         # print sendMsg
         # print type(sendMsg)
-        mEmail.sendEmail(sendMsg[:24], sendMsg)
+        mEmail.sendEmail(sendMsg[:30], sendMsg)
     except Exception, e:
         print traceback.format_exc()
         logger.debug('[HS],' + traceback.format_exc())
