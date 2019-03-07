@@ -6,10 +6,10 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
-username = '13816025562'
-sender = '13816025562@139.com'
+username = 'llysonylin2012'
+sender = 'llysonylin2012@163.com'
 password = 'love1985'
-smtp_server = 'smtp.139.com'
+smtp_server = 'smtp.163.com'
 
 receivers = ','.join(['firenews2016@163.com'])
 
@@ -40,3 +40,15 @@ def sendEmail(in_sub, in_content):
 
 
 # sendEmail(u'你好', u'上海发生')
+
+
+import time
+from apns import APNs, Frame, Payload
+
+def sendIOS():
+    apns = APNs(use_sandbox=True, cert_file='public.pem', key_file='private.pem')
+
+    # Send a notification
+    token_hex = 'be0bbd1c579635e1817605acc3c615608f80fa89a40b7688ee8a45693a961cde'
+    payload = Payload(alert="Hello World!", sound="default", badge=1)
+    apns.gateway_server.send_notification(token_hex, payload)
