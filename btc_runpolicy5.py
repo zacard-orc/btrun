@@ -123,7 +123,6 @@ def api_getRunData(mode='real'):
             devices=insdb.sBtcGetAllAppDeviceToken()
             mEmail.sendIOS(devices,sendMsg)
 
-             # mEmail.sendEmail(sendMsg[:30], sendMsg)
 
 
     except Exception, e:
