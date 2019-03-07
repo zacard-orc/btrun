@@ -148,6 +148,10 @@ class A_SDB:
         return self.OpsSql()
 
     # OpsTrade
+    def sBtcGetAllAppDeviceToken(self):
+        self.sql='select device_token from wb_app_token'
+        return self.OpsSql()
+
     def sBtcInsertPushMsg(self,o):
         self.sql='insert into wb_push_his(type,msg) values(\''+o['type']+'\',\''+o['msg']+'\')'
         self.DMLSql()

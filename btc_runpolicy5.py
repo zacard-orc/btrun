@@ -114,13 +114,18 @@ def api_getRunData(mode='real'):
 
         if len(msg_list)>0:
             sendMsg = u'\n'.join(msg_list)
-            # print sendMsg
-            # print type(sendMsg)
-            # mEmail.sendEmail(sendMsg[:30], sendMsg)
+
             o={}
             o['type']='coin'
             o['msg']=sendMsg
             insdb.sBtcInsertPushMsg(o)
+
+            devices=insdb.sBtcGetAllAppDeviceToken()
+            mEmail.sendIOS(devices,sendMsg)
+
+             # mEmail.sendEmail(sendMsg[:30], sendMsg)
+
+
     except Exception, e:
         print traceback.format_exc()
         logger.debug('[HS],' + traceback.format_exc())
