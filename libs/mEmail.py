@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import urllib, urllib2,logging
+import urllib, urllib2, logging
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -22,7 +22,10 @@ def sendEmail(in_sub, in_content):
     msg['To'] = receivers
 
     # 文字部分
-    puretext = MIMEText(in_content.encode('utf-8'))
+    puretext = MIMEText(in_content.encode('utf-8'), 'plain', 'utf-8')
+    msg["Accept-Language"] = "zh-CN"
+    msg["Accept-Charset"] = "ISO-8859-1,utf-8"
+
     msg.attach(puretext)
 
     try:
@@ -32,7 +35,8 @@ def sendEmail(in_sub, in_content):
         client.sendmail(sender, receivers, msg.as_string())
         client.quit()
         logging.debug('邮件已发送')
-    except Exception,e:
+    except Exception, e:
         logging.debug(e.message)
 
-sendEmail(u'你好','')
+
+# sendEmail(u'你好', u'上海发生')
