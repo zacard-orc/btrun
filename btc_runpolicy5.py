@@ -41,6 +41,7 @@ def api_getRunData(mode='real'):
         if mode != 'real':
             insdb.sBtcClearDevOps()
 
+        msg_list = []
         for i in range(len(kp_coin)):
             o = {}
             kp = kp_coin[i]
@@ -62,13 +63,14 @@ def api_getRunData(mode='real'):
                 场景一：
                 价格在maXX下方0.3%
                 '''
-                logger.debug('判断数据，'+str(real_rtn['close'])+','+str(real_rtn['p_ma30']))
+                logger.debug('判断数据，' + str(real_rtn['close']) + ',' + str(real_rtn['p_ma30']))
                 cond1 = (real_rtn['close'] - real_rtn['p_ma30']) * 100 / real_rtn['p_ma30']
                 cond2 = real_rtn['angle_v_ma5'] > 5
                 if cond1 <= -1 and cond2:
-                    msg = 'BBOT,'+kp + ',ma30下方,' + str(real_rtn['close'])
+                    msg = 'BBOT,' + kp + ',ma30下方,' + str(real_rtn['close'])
                     logger.debug(msg)
-                    mEmail.sendEmail(msg, msg)
+                    msg_list.append(msg)
+                    # mEmail.sendEmail(msg, msg)
 
                 '''
                 场景二：
@@ -79,9 +81,10 @@ def api_getRunData(mode='real'):
                 cond3 = real_rtn['angle_v_ma5'] >= 55
 
                 if cond1 and cond2 and cond3:
-                    msg = 'BBOT,'+kp + ',单边上涨,' + str(real_rtn['close'])+','+str(real_rtn['angle_v_ma5'])
+                    msg = 'BBOT,' + kp + ',单边上涨,' + str(real_rtn['close']) + ',' + str(real_rtn['angle_v_ma5'])
                     logger.debug(msg)
-                    mEmail.sendEmail(msg, msg)
+                    msg_list.append(msg)
+                    # mEmail.sendEmail(msg, msg)
 
                 '''
                 场景三：
@@ -102,12 +105,15 @@ def api_getRunData(mode='real'):
                 # cond3 = (real_rtn['close'] - real_rtn['p_ma30']) * 100 / real_rtn['p_ma30']
                 cond4 = real_rtn['close'] > real_rtn['p_ma30']
                 if cond1 and cond4:
-                    msg = 'BBOT,'+kp + ',ma30 上方拐点,' + str(real_rtn['close'])
+                    msg = 'BBOT,' + kp + ',ma30 上方拐点,' + str(real_rtn['close'])
                     logger.debug(msg)
-                    mEmail.sendEmail(msg, msg)
+                    msg_list.append(msg)
+                    #
 
-
-
+        sendMsg = u'\n'.join(msg_list)
+        # print sendMsg
+        # print type(sendMsg)
+        mEmail.sendEmail(sendMsg[:24], sendMsg)
     except Exception, e:
         print traceback.format_exc()
         logger.debug('[HS],' + traceback.format_exc())

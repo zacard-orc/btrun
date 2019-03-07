@@ -22,7 +22,7 @@ def sendEmail(in_sub, in_content):
     msg['To'] = receivers
 
     # 文字部分
-    puretext = MIMEText('')
+    puretext = MIMEText(in_content.encode('utf-8'))
     msg.attach(puretext)
 
     try:
@@ -35,4 +35,4 @@ def sendEmail(in_sub, in_content):
     except Exception,e:
         logging.debug(e.message)
 
-# sendEmail(u'你好','')
+sendEmail(u'你好','')
