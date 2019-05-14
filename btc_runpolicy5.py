@@ -65,9 +65,10 @@ def api_getRunData(mode='real'):
                 '''
                 logger.debug('判断数据，' + str(real_rtn['close']) + ',' + str(real_rtn['p_ma30']))
                 cond1 = (real_rtn['close'] - real_rtn['p_ma30']) * 100 / real_rtn['p_ma30']
-                cond2 = real_rtn['angle_v_ma5'] > 10
+                cond2 = real_rtn['angle_v_ma5'] > 18
                 if cond1 <= -1 and cond2:
-                    msg = 'BBOT,' + kp + ',ma30下方,' + str(real_rtn['close'])+','+str(real_rtn['angle_v_ma5'])
+                    msg = 'BBOT,' + kp + ',ma30下方,' + str(real_rtn['close']) \
+                          + ',' + str(real_rtn['angle_v_ma5'])
                     logger.debug(msg)
                     msg_list.append(msg)
                     # msg_list.append(msg)
@@ -83,7 +84,8 @@ def api_getRunData(mode='real'):
                 cond3 = real_rtn['angle_v_ma5'] >= 55
 
                 if cond1 and cond2 and cond3:
-                    msg = 'BBOT,' + kp + ',单边上涨,' + str(real_rtn['close']) + ',' + str(real_rtn['angle_v_ma5'])
+                    msg = 'BBOT,' + kp + ',单边上涨,' + str(real_rtn['close']) \
+                          + ',' + str(real_rtn['angle_v_ma5'])
                     logger.debug(msg)
                     msg_list.append(msg)
                     # mEmail.sendEmail(msg, msg)
@@ -107,21 +109,26 @@ def api_getRunData(mode='real'):
                 # cond3 = (real_rtn['close'] - real_rtn['p_ma30']) * 100 / real_rtn['p_ma30']
                 cond4 = real_rtn['close'] > real_rtn['p_ma30']
                 if cond1 and cond4:
-                    msg = 'BBOT,' + kp + ',ma30 上方拐点,' + str(real_rtn['close'])
+                    msg = 'BBOT,' + kp + ',ma30 上方拐点,' + str(real_rtn['close'])\
+                          +','+str(real_rtn['angle_v_ma5'])
                     logger.debug(msg)
                     msg_list.append(msg)
                     #
 
-        if len(msg_list)>0:
+        if len(msg_list) > 0:
             sendMsg = u'\n'.join(msg_list)
 
-            o={}
-            o['type']='coin'
-            o['msg']=sendMsg
+            o = {}
+            o['type'] = 'coin'
+            o['msg'] = sendMsg
             insdb.sBtcInsertPushMsg(o)
 
-            devices=insdb.sBtcGetAllAppDeviceToken()
-            mEmail.sendIOS(devices,sendMsg)
+            devices = insdb.sBtcGetAllAppDeviceToken()
+
+            # 临时注释
+            # if int(datetime.datetime.now().strftime('%H')) >= 7 and\
+            #                 int(datetime.datetime.now().strftime('%H')) < 23:
+            #     mEmail.sendIOS(devices, sendMsg)
 
 
 
