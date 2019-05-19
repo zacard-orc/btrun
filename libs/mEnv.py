@@ -97,20 +97,27 @@ env_dbinfo={
         'db_conn_num':3
     },
      'work':{
-        'db_host':'106.14.2.14',
-        'db_port': 3306,
-        'db_user':'nmw',
-        'db_passwd':'8kwIower!q',
-        'db_name':'nmw',
-        'db_charset':'utf8mb4',
-        'db_conn_num':3
+        # 'db_host':'106.14.2.14',
+        # 'db_port': 3306,
+        # 'db_user':'nmw',
+        # 'db_passwd':'8kwIower!q',
+        # 'db_name':'nmw',
+        # 'db_charset':'utf8mb4',
+        # 'db_conn_num':3
         # 'db_host':'rm-uf6h56xc3823320z4yo.mysql.rds.aliyuncs.com',
         # 'db_port': 3306,
         # 'db_user':'loan_app',
         # 'db_passwd':'h4Qf1JW4L9ttruKDZzBxcHlYNR3ZHW2',
         # 'db_name':'loan',
         # 'db_charset':'utf8mb4',
-        # 'db_conn_num':3
+        # 'db_conn_num':3,
+        'db_host':'rm-uf6h56xc3823320z4yo.mysql.rds.aliyuncs.com',
+        'db_port': 3306,
+        'db_user':'ft_app',
+        'db_passwd':'ENGU0t2H1uxTsBeokLIr3U',
+        'db_name':'ft',
+        'db_charset':'utf8mb4',
+        'db_conn_num':3
     },
      'work_out':{
         'db_host':'106.14.2.14',
