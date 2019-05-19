@@ -153,7 +153,7 @@ class A_SDB:
         return self.OpsSql()
 
     def sBtcInsertPushMsg(self,o):
-        self.sql='insert into wb_push_his(type,msg) values(' \
+        self.sql='insert into wb_push_his(type,coin,msg) values(' \
                  '\''+o['type']+'\',' \
                  '\''+o['coin']+'\',' \
                  '\''+o['msg']+'\')'

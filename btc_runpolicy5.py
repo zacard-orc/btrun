@@ -121,7 +121,7 @@ def api_getRunData(mode='real'):
 
         if len(msg_list) > 0:
             sendMsg = u'\n'.join(msg_list)
-            sendCoin =u'\n'.join(coin_list)
+            sendCoin =u','.join(coin_list).replace('usdt','')
 
             o = {}
             o['type'] = 'coin'
