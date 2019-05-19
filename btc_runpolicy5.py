@@ -42,6 +42,7 @@ def api_getRunData(mode='real'):
             insdb.sBtcClearDevOps()
 
         msg_list = []
+        coin_list = []
         for i in range(len(kp_coin)):
             o = {}
             kp = kp_coin[i]
@@ -71,6 +72,7 @@ def api_getRunData(mode='real'):
                           + ',' + str(real_rtn['angle_v_ma5'])
                     logger.debug(msg)
                     msg_list.append(msg)
+                    coin_list.append(kp)
                     # msg_list.append(msg)
 
                     # mEmail.sendEmail(msg, msg)
@@ -88,6 +90,7 @@ def api_getRunData(mode='real'):
                           + ',' + str(real_rtn['angle_v_ma5'])
                     logger.debug(msg)
                     msg_list.append(msg)
+                    coin_list.append(kp)
                     # mEmail.sendEmail(msg, msg)
 
                 '''
@@ -113,13 +116,16 @@ def api_getRunData(mode='real'):
                           +','+str(real_rtn['angle_v_ma5'])
                     logger.debug(msg)
                     msg_list.append(msg)
+                    coin_list.append(kp)
                     #
 
         if len(msg_list) > 0:
             sendMsg = u'\n'.join(msg_list)
+            sendCoin =u'\n'.join(coin_list)
 
             o = {}
             o['type'] = 'coin'
+            o['coin']  = sendCoin
             o['msg'] = sendMsg
             insdb.sBtcInsertPushMsg(o)
 
